@@ -1,8 +1,10 @@
 import Data.Maybe
 import Text.Parsec
 
+import Data.Foldable
 import Data.List (foldl')
-import Data.Vector (Vector)
+import Data.Vector.Mutable (MVector)
+import qualified Data.Vector.Mutable as M
 import qualified Data.Vector as V
 
 data Position = P { x :: Int, y :: Int}
@@ -49,29 +51,26 @@ toMaybe (Right x) = Just x
 
 readInstruction = toMaybe . parse instruction ""
 
-flipSwitch :: Int -> LightState -> LightState
-flipSwitch n | even n    = id
-             | otherwise = toggle
+toUpdate (P sx sy) (P ex ey) = [x+y*1000 | x <- [sx..ex], y <- [sy..ey]]
 
-theseInstructions :: Position -> [Instruction] -> [Instruction]
-theseInstructions p = filter (inRange p)
+execute :: Command -> Int -> Int
+execute (Turn On) = (+1)
+execute (Turn Off) = max 0 . (+(-1))
+execute Toggle = (+2)
 
-finalState :: [Instruction] -> Position -> LightState
-finalState = finalState' 0
-  where finalState' n [] _ = flipSwitch n Off
-        finalState' n (i@(I _ _ (Turn t)):is) p
-          | inRange p i = flipSwitch n t
-          | otherwise = finalState' n is p
-        finalState' n (i@(I _ _ Toggle):is) p
-          | inRange p i = finalState' (n+1) is p
-          | otherwise = finalState' n is p
+unsafeModify v f i = M.unsafeRead v i >>= M.unsafeWrite v i . f
 
-process input = length
-              . filter (==On)
-              . map (finalState instructions)
-              $ [(P x y) | x <- [0..999], y <- [0..999]]
-  where instructions = reverse . mapMaybe readInstruction . lines $ input
+process input = do
+  let instructions = mapMaybe readInstruction . lines $ input
+  v <- M.new (1000*1000)
+  M.set v 0
+  forM_ instructions $ \(I start end cmd) -> do
+    putStrLn (show start ++ ", " ++ show end ++ ", " ++ show cmd)
+    forM_ (toUpdate start end) $ \i -> unsafeModify v (execute cmd) i
+  V.freeze v
+
 
 main = do
    input <- readFile "input.txt"
-   print (process input)
+   output <- process input
+   print (sum output)
