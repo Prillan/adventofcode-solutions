@@ -1,11 +1,19 @@
+import Data.List (isInfixOf)
 
+nice s = cond1 && cond2
+  where cond1 = cond1' s
+        cond1' [] = False
+        cond1' [_] = False
+        cond1' (x:y:xs)
+          | isInfixOf [x, y] xs = True
+          | otherwise = cond1' (y:xs)
 
-vowles = "aeiou"
-badSubstrings = ["ab", "cd", "pq", "xy"]
-
-nice s =  length (filter (`elem` vowles) s) >= 3
-       && null (filter (`elem` badSubstrings) $ zipWith (\x y -> [x, y]) s (tail s))
-       && (not . null . filter id $ zipWith (==) s (tail s))
+        cond2 = cond2' s
+        cond2' [] = False
+        cond2' [x] = False
+        cond2' [x, y] = False
+        cond2' (x:y:z:xs) | x == z    = True
+                          | otherwise = cond2' (y:z:xs)
 
 process = length . filter nice . lines
 
