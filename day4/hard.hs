@@ -8,7 +8,7 @@ privateKey = "yzbqklnj"
 
 candidates = map (\i -> privateKey <> (B.pack $ show i)) $ [(1 :: Integer)..]
 
-process = filter (all (== '0') . take 5 . show . snd)
+process = filter (all (== '0') . take 6 . show . snd)
         . map (\c -> (c, hash c :: Digest MD5)) $ candidates
 
 main = do
