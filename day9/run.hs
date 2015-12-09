@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE FlexibleContexts #-}
-import Data.List (minimumBy)
+import Data.List (minimumBy, permutations, nub)
 import Data.Maybe
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -33,19 +33,15 @@ readPath s = case parse path "" s of
                Right x -> Just x
                Left _ -> Nothing
 
---process :: String -> Result
 process = shortestPath . mapMaybe readPath . lines
 
 type Result = ([City], Distance)
 
 shortestPath :: [Path] -> Result
-shortestPath paths = minimumBy (\a b -> snd a `compare` snd b) allPaths
-  where cities = Set.toList . Set.fromList $ map start paths ++ map stop paths
-        allPaths = concatMap (\c -> allPaths' 0 c (remove c cities) [c]) cities
-        allPaths' :: Distance -> City -> [City] -> [City] -> [Result]
-        allPaths' n c [] acc = [(acc, n)]
-        allPaths' n c cs acc =
-          concatMap (\c' -> allPaths' (n + lookup c c') c' (remove c' cs) (c':acc)) cs
+shortestPath paths = minimumBy (\a b -> snd a `compare` snd b)
+                   . map (\cs -> (cs, sum $ zipWith lookup cs (drop 1 cs)))
+                   . permutations $ cities
+  where cities = nub $ map start paths ++ map stop paths
         distances = Map.fromList . map (\p -> ((start p, stop p), dist p)) $ paths
         lookup s e = fromJust $ Map.lookup (s, e) distances <|> Map.lookup (e, s) distances
 
