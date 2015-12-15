@@ -22,8 +22,7 @@ data Command = SET Value
              | NOT Value
   deriving Show
 
-instance Eq a => Eq (b -> a) where
-  _ == _ = True
+instance Eq a => Eq (b -> a)
 instance Bits a => Bits (b -> a) where
   f .&. g   = \x -> f x .&. g x
   f .|. g   = \x -> f x .|. g x
