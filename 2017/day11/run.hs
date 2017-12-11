@@ -32,7 +32,7 @@ parseAll = map toCoord . go . head . lines
         go (x:y:',':xs) = [x, y]:go xs
 
 dist :: Coord Int -> Int
-dist (C x y _) = abs $ x + y
+dist (C x y z) = (abs x + abs y + abs z) `div` 2
 
 part1 :: [Coord Int] -> Int
 part1 = dist . sum
