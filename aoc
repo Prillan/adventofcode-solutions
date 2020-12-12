@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -xe
+
+YEAR=2020
+
+day () {
+    echo $1;
+    mkdir -p "$YEAR/day$1"
+    if ! [ -e "$YEAR/day$1/run.hs" ]; then
+        cp "template/run.hs" "$YEAR/day$1/"
+    fi
+    cd "$YEAR/day$1"
+    nix-shell ../../shell.nix --run zsh
+}
+
+case $1 in
+    *) day $1;;
+esac
