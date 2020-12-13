@@ -11,6 +11,8 @@ module AoC ( tce
            , extendX'
            , extendY'
            , extendZ'
+           , gcdExt
+           , modInv
            , module AoC.Grid ) where
 
 import Control.Applicative (liftA2)
@@ -70,3 +72,21 @@ instance Num a => Num (V3 a) where
   abs = fmap abs
   signum = fmap signum
   fromInteger = pure . fromInteger
+
+
+modInv :: Int -> Int -> Maybe Int
+modInv a m
+  | 1 == g = Just (mkPos i)
+  | otherwise = Nothing
+  where
+    (i, _, g) = gcdExt a m
+    mkPos x
+      | x < 0 = x + m
+      | otherwise = x
+
+gcdExt :: Int -> Int -> (Int, Int, Int)
+gcdExt a 0 = (1, 0, a)
+gcdExt a b =
+  let (q, r) = a `quotRem` b
+      (s, t, g) = gcdExt b r
+  in (t, s - q * t, g)
