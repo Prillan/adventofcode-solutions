@@ -13,9 +13,13 @@ module AoC ( tce
            , extendZ'
            , gcdExt
            , modInv
+           , bitsFromBools
+           , boolsFromBits
            , module AoC.Grid ) where
 
+
 import Control.Applicative (liftA2)
+import Data.Bits (Bits, setBit, testBit)
 
 import qualified AoC.Grid
 import Debug.Trace (trace)
@@ -90,3 +94,11 @@ gcdExt a b =
   let (q, r) = a `quotRem` b
       (s, t, g) = gcdExt b r
   in (t, s - q * t, g)
+
+
+bitsFromBools :: (Num b, Bits b) => [Bool] -> b
+bitsFromBools = foldl f 0 . zip [0..] . reverse
+  where f acc (i, True) = setBit acc i
+        f acc _ = acc
+
+boolsFromBits n b = reverse $ map (testBit b) [0..n-1]
