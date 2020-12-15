@@ -1,19 +1,26 @@
 #!/bin/bash
 
-set -xe
+set -e
+shopt -s extglob
 
 YEAR=2020
 
+usage () {
+    echo 'usage: ./aoc DAY' >&2
+    exit 1
+}
+
 day () {
-    echo $1;
+    echo "Setting up day $1 ($YEAR)";
     mkdir -p "$YEAR/day$1"
     if ! [ -e "$YEAR/day$1/run.hs" ]; then
         cp "template/run.hs" "$YEAR/day$1/"
     fi
     cd "$YEAR/day$1"
-    nix-shell ../../shell.nix --run zsh
+    exec nix-shell ../../shell.nix --run "$SHELL"
 }
 
 case $1 in
-    *) day $1;;
+    +([0-9])) day $1;;
+    *) usage;;
 esac
