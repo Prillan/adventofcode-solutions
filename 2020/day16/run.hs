@@ -15,6 +15,8 @@ import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
+import Data.IntSet (IntSet)
+import qualified Data.IntSet as IntSet
 import Text.Read (readMaybe)
 
 unsafeMapMaybe f = map g
@@ -32,6 +34,7 @@ data Field = Field { fieldName   :: String
   deriving (Show, Eq, Ord)
 
 type Range = (Int, Int)
+
 readRange x =
   case splitOn "-" x of
     [l, h] -> (,) <$> readMaybe l <*> readMaybe h
@@ -61,11 +64,44 @@ part1 (fs, _, others) =
   . filter (not . flip validValue fs)
   $ concat others
 
-assignFields fs = go Set.empty fs . transpose
-  where go assigned _ [] = [[]]
-        go assigned remaining (fnums:rest) = do
-          o <- filter (\f -> all (`validForField` f) fnums) remaining
-          map (o:) (go (Set.insert o assigned) (filter (/= o) remaining) rest)
+for = flip map
+
+-- Sets things up by
+--   - checking which fields are valid for each column
+--   - replacing each field with an integer for more speed
+--   - sorting the input by number of candidates (smaller first)
+--     (returns the permutation in order to unsort it later)
+prep :: [Field] -> [[Int]] -> ([Int], [([Int], [Int])])
+prep fs fnums =
+  let fieldMap = Map.fromList $ zip fs [0..]
+      validFields =
+        for fnums $ \nums ->
+          map (fieldMap Map.!)
+          . filter (\f -> all (`validForField` f) nums)
+          $ fs
+      (perm, sortedFields, sortedNums) =
+        unzip3
+        . sortOn (\(_, vfs, _) -> length vfs)
+        $ zip3 [0..] validFields fnums
+  in (perm, zip sortedFields sortedNums)
+
+assignFields fs tickets =
+  let (perm, xs) = prep fs $ transpose tickets
+      results = assignFields' xs
+      fixResult r =
+        map snd         -- -+
+        . sortOn fst    --  +--- unsort the fields
+        . zip perm      -- -+
+        $ map (fs !!) r -- look up the field by index
+  in map fixResult results
+
+assignFields' :: [([Int], [Int])] -> [[Int]]
+assignFields' = go IntSet.empty
+  where go assigned [] = [[]]
+        go assigned ((fs, nums):rest) = do
+          o <- filter (not . flip IntSet.member assigned)
+               $ fs
+          map (o:) (go (IntSet.insert o assigned) rest)
 
 part2 (fs, ticket, others) =
   let valid  = filter (all (`validValue` fs)) others
@@ -75,8 +111,6 @@ part2 (fs, ticket, others) =
      . filter (isPrefixOf "departure" . fieldName . fst)
      $ zip fields ticket
 
--- Runs in ~3m 30s
--- ./run  207,18s user 0,23s system 99% cpu 3:27,52 total
 main = do
    input <- parseAll <$> readFile "input.txt"
    print (part1 input)
