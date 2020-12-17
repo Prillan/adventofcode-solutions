@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
 import AoC
 import AoC.Grid
@@ -13,28 +15,20 @@ import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
--- import Text.Megaparsec
--- import Text.Megaparsec.Char
+import Data.IntSet (IntSet)
+import qualified Data.IntSet as IntSet
 
--- type Parser = Parsec (ErrorItem Char) String
+parse = id
 
-type Counter a = Map a Int
-
-counter :: Ord a => [a] -> Counter a
-counter = Map.fromListWith (+) . flip zip (repeat 1)
-
-unsafeRight :: Show a => Either a b -> b
-unsafeRight (Right x) = x
-unsafeRight (Left x) = error $ show x
-
-parseAll =
-  map unsafeRight .
-  map (parse _ "") . lines
+parseAll = map parse  . lines
 
 part1 = id
 part2 = id
 
-main = do
-   input <- parseAll <$> readFile "input.txt"
+main = main' "input.txt"
+exampleMain = main' "example.txt"
+
+main' file = do
+   input <- parseAll <$> readFile file
    print (part1 input)
---   print (part2 input)
+   print (part2 input)

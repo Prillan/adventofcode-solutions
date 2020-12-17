@@ -15,11 +15,15 @@ module AoC ( tce
            , modInv
            , bitsFromBools
            , boolsFromBits
+           , Counter
+           , counter
            , module AoC.Grid ) where
 
 
 import Control.Applicative (liftA2)
 import Data.Bits (Bits, setBit, testBit)
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 
 import qualified AoC.Grid
 import Debug.Trace (trace)
@@ -102,3 +106,9 @@ bitsFromBools = foldl f 0 . zip [0..] . reverse
         f acc _ = acc
 
 boolsFromBits n b = reverse $ map (testBit b) [0..n-1]
+
+
+type Counter a = Map a Int
+
+counter :: Ord a => [a] -> Counter a
+counter = Map.fromListWith (+) . flip zip (repeat 1)

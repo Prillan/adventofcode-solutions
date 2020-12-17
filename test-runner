@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -e
+
+if [ -z $YEAR ]; then
+    YEAR=2020
+fi
+
+status () {
+    echo "===" "$1" "$2" "==="
+}
+
+for d in $(ls 2020 | sort -V); do
+    status "COMPILING" "$d"
+    cd "2020/$d"
+    ghc -O2 run.hs
+    status "RUNNING" "$d"
+    time ./run
+    status "ALL DONE" "$d"
+    cd -
+done

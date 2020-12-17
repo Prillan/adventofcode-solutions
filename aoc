@@ -20,7 +20,12 @@ day () {
     exec nix-shell ../../shell.nix --run "$SHELL"
 }
 
+testAll () {
+    YEAR=$YEAR nix-shell --run "./test-runner"
+}
+
 case $1 in
     +([0-9])) day $1;;
+    testAll) testAll;;
     *) usage;;
 esac
