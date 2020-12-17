@@ -5,7 +5,9 @@ in { nixpkgs ? import (fetchTarball archive) { } }:
 let
   inherit (nixpkgs) haskellPackages;
   aoc = haskellPackages.callPackage ./adventofcode/default.nix { };
+  pkgs = hpkgs: [ hpkgs.split hpkgs.vector aoc ];
 in nixpkgs.mkShell {
-  buildInputs =
-    [ (haskellPackages.ghcWithPackages (hpkgs: [ hpkgs.split aoc ])) ];
+  buildInputs = [
+    (haskellPackages.ghcWithPackages pkgs)
+  ];
 }
