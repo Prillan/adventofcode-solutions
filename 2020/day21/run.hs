@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
@@ -25,45 +24,56 @@ import Data.Void
 
 type Parser = Parsec Void String
 
-foodP :: Parser ([String], [String])
+foodP :: Parser (Set String, Set String)
 foodP = do
   ingredients <- endBy1 (many letterChar) space1
   allergies <- between (string "(contains ")
                        (char ')')
                        (sepBy1 (many letterChar) (string ", "))
-  pure (ingredients, allergies)
+  pure (Set.fromList ingredients, Set.fromList allergies)
 
+
+parseAll :: String -> [(Set String, Set String)]
 parseAll =
   map (\(Right x) -> x)
   . map (parse foodP "")
   . lines
 
+
+allergeneOptions :: [(Set String, Set String)]
+                 -> Map String (Set String)
 allergeneOptions =
   Map.unionsWith Set.intersection
-  . map (\(is, as) -> Map.fromList $ [ (a, Set.fromList is) | a <- as])
+  . map (\(is, as) -> Map.fromList . Set.toList $ Set.map (,is) as)
 
+uniqueAssignments :: Map String (Set String) -> Map String String
+uniqueAssignments =
+  Map.fromList
+  . concatMap (\(i, a) -> map (,i) (Set.toList a))
+  . Map.toList
+  . Map.filter ((== 1) . Set.size)
+
+assign :: [(Set String, Set String)] -> Map String String
 assign foods = fst $ fixpoint go (Map.empty, allergeneOptions foods)
   where go (assigned, remaining) =
-          let newUnique =
-                Map.fromList
-                . concatMap (\(i, a) -> (,i) <$> Set.toList a)
-                . Map.toList
-                . Map.filter ((== 1) . Set.size)
-                $ remaining
+          let newUnique = uniqueAssignments remaining
               newUniqueAllergenes = Map.keysSet newUnique
-              assigned' = Map.union assigned newUnique
+              assigned' = assigned <> newUnique
               remaining' =
                 Map.filter (not . Set.null)
                 . Map.map (`Set.difference` newUniqueAllergenes)
                 $ remaining
           in (assigned', remaining')
 
+part1 :: [(Set String, Set String)] -> Int
 part1 foods =
-  let appearances = counter $ concatMap fst foods
+  let appearances = counter $ concatMap (Set.toList . fst) foods
       allIngredients = Map.keysSet appearances
       matched = Set.unions . Map.elems $ allergeneOptions foods
       excluded = appearances `Map.withoutKeys` matched
   in sum $ Map.elems excluded
+
+part2 :: [(Set String, Set String)] -> String
 part2 = intercalate "," . map fst . sortOn snd . Map.toList . assign
 
 main = main' "input.txt"
