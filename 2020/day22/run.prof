@@ -1,0 +1,81 @@
+	Tue Dec 22 13:15 2020 Time and Allocation Profiling Report  (Final)
+
+	   run +RTS -p -RTS
+
+	total time  =        3.41 secs   (3409 ticks @ 1000 us, 1 processor)
+	total alloc = 1,551,108,424 bytes  (excludes profiling overheads)
+
+COST CENTRE         MODULE    SRC                    %time %alloc
+
+recursiveCombat.go  Main      run.hs:(66,9)-(72,57)   82.2   44.0
+recursiveCombat.go' Main      run.hs:(75,9)-(81,45)   17.3   54.4
+int                 Main      run.hs:31:1-18           0.5    1.5
+
+
+                                                                                                                         individual      inherited
+COST CENTRE               MODULE                    SRC                                               no.     entries  %time %alloc   %time %alloc
+
+MAIN                      MAIN                      <built-in>                                        135          0    0.0    0.0   100.0  100.0
+ CAF                      Main                      <entire-module>                                   269          0    0.0    0.0     0.0    0.0
+  combat                  Main                      run.hs:(50,1)-(55,45)                             275          1    0.0    0.0     0.0    0.0
+  int                     Main                      run.hs:31:1-18                                    321          1    0.0    0.0     0.0    0.0
+  main                    Main                      run.hs:86:1-24                                    270          1    0.0    0.0     0.0    0.0
+   main'                  Main                      run.hs:(90,1)-(93,22)                             271          1    0.0    0.0     0.0    0.0
+  parse                   Main                      run.hs:(34,1)-(38,9)                              310          1    0.0    0.0     0.0    0.0
+  part1                   Main                      run.hs:83:1-14                                    274          1    0.0    0.0     0.0    0.0
+  part2                   Main                      run.hs:84:1-29                                    315          1    0.0    0.0     0.0    0.0
+  recursiveCombat         Main                      run.hs:(64,1)-(81,45)                             317          1    0.0    0.0     0.0    0.0
+  score                   Main                      run.hs:58:1-60                                    313          1    0.0    0.0     0.0    0.0
+  parseAll                Main                      run.hs:(41,1)-(47,13)                             289          0    0.0    0.0     0.0    0.0
+   parseAll.(...)         Main                      run.hs:(42,7)-(46,11)                             290          0    0.0    0.0     0.0    0.0
+    splitOn               Data.List.Split.Internals src/Data/List/Split/Internals.hs:421:1-42         291          0    0.0    0.0     0.0    0.0
+     dropDelims           Data.List.Split.Internals src/Data/List/Split/Internals.hs:295:1-39         293          1    0.0    0.0     0.0    0.0
+     onSublist            Data.List.Split.Internals src/Data/List/Split/Internals.hs:278:1-72         299          0    0.0    0.0     0.0    0.0
+ CAF                      Data.List.Split.Internals <entire-module>                                   268          0    0.0    0.0     0.0    0.0
+  defaultSplitter         Data.List.Split.Internals src/Data/List/Split/Internals.hs:(58,1)-(63,28)   292          1    0.0    0.0     0.0    0.0
+ CAF                      GHC.Conc.Signal           <entire-module>                                   246          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Encoding           <entire-module>                                   230          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Encoding.Iconv     <entire-module>                                   228          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Exception          <entire-module>                                   222          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Handle.FD          <entire-module>                                   220          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Handle.Internals   <entire-module>                                   219          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Handle.Text        <entire-module>                                   218          0    0.0    0.0     0.0    0.0
+ CAF                      Text.Read.Lex             <entire-module>                                   185          0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.FD                 <entire-module>                                   162          0    0.0    0.0     0.0    0.0
+ main                     Main                      run.hs:86:1-24                                    272          0    0.0    0.0   100.0  100.0
+  main'                   Main                      run.hs:(90,1)-(93,22)                             273          0    0.0    0.0   100.0  100.0
+   parseAll               Main                      run.hs:(41,1)-(47,13)                             279          1    0.0    0.0     0.0    0.0
+    parseAll.(...)        Main                      run.hs:(42,7)-(46,11)                             282          1    0.0    0.0     0.0    0.0
+     splitOn              Data.List.Split.Internals src/Data/List/Split/Internals.hs:421:1-42         283          1    0.0    0.0     0.0    0.0
+      onSublist           Data.List.Split.Internals src/Data/List/Split/Internals.hs:278:1-72         288          1    0.0    0.0     0.0    0.0
+      split               Data.List.Split.Internals src/Data/List/Split/Internals.hs:249:1-68         284          1    0.0    0.0     0.0    0.0
+       fromElem           Data.List.Split.Internals src/Data/List/Split/Internals.hs:(116,1)-(117,24) 308          2    0.0    0.0     0.0    0.0
+       splitInternal      Data.List.Split.Internals src/Data/List/Split/Internals.hs:(139,1)-(148,70) 296          2    0.0    0.0     0.0    0.0
+        breakDelim        Data.List.Split.Internals src/Data/List/Split/Internals.hs:(151,1)-(156,36) 297        162    0.0    0.0     0.0    0.0
+         matchDelim       Data.List.Split.Internals src/Data/List/Split/Internals.hs:(73,1)-(77,23)   300        214    0.0    0.0     0.0    0.0
+       delimiter          Data.List.Split.Internals src/Data/List/Split/Internals.hs:25:30-38         298          1    0.0    0.0     0.0    0.0
+       postProcess        Data.List.Split.Internals src/Data/List/Split/Internals.hs:(163,1)-(168,45) 285          1    0.0    0.0     0.0    0.0
+        condensePolicy    Data.List.Split.Internals src/Data/List/Split/Internals.hs:32:30-43         295          1    0.0    0.0     0.0    0.0
+        delimPolicy       Data.List.Split.Internals src/Data/List/Split/Internals.hs:27:30-40         287          1    0.0    0.0     0.0    0.0
+        doCondense        Data.List.Split.Internals src/Data/List/Split/Internals.hs:(178,1)-(183,20) 294          1    0.0    0.0     0.0    0.0
+        doDrop            Data.List.Split.Internals src/Data/List/Split/Internals.hs:(172,1)-(173,14) 303          1    0.0    0.0     0.0    0.0
+        doMerge           Data.List.Split.Internals src/Data/List/Split/Internals.hs:(205,1)-(207,14) 286          1    0.0    0.0     0.0    0.0
+        dropFinal         Data.List.Split.Internals src/Data/List/Split/Internals.hs:(236,1)-(241,26) 306          1    0.0    0.0     0.0    0.0
+        dropInitial       Data.List.Split.Internals src/Data/List/Split/Internals.hs:(231,1)-(232,19) 304          1    0.0    0.0     0.0    0.0
+        finalBlankPolicy  Data.List.Split.Internals src/Data/List/Split/Internals.hs:37:30-45         307          1    0.0    0.0     0.0    0.0
+        initBlankPolicy   Data.List.Split.Internals src/Data/List/Split/Internals.hs:35:30-44         305          1    0.0    0.0     0.0    0.0
+        insertBlanks      Data.List.Split.Internals src/Data/List/Split/Internals.hs:(189,1)-(191,38) 301          1    0.0    0.0     0.0    0.0
+         insertBlanks'    Data.List.Split.Internals src/Data/List/Split/Internals.hs:(195,1)-(201,49) 302          4    0.0    0.0     0.0    0.0
+     parse                Main                      run.hs:(34,1)-(38,9)                              311          0    0.0    0.0     0.0    0.0
+    parseAll.p1           Main                      run.hs:(42,7)-(46,11)                             312          1    0.0    0.0     0.0    0.0
+    parseAll.p2           Main                      run.hs:(42,7)-(46,11)                             281          1    0.0    0.0     0.0    0.0
+   part1                  Main                      run.hs:83:1-14                                    277          0    0.0    0.0     0.0    0.0
+    combat                Main                      run.hs:(50,1)-(55,45)                             278          0    0.0    0.0     0.0    0.0
+     combat.go            Main                      run.hs:(51,9)-(55,45)                             280        300    0.0    0.0     0.0    0.0
+      score               Main                      run.hs:58:1-60                                    314          0    0.0    0.0     0.0    0.0
+   part2                  Main                      run.hs:84:1-29                                    316          0    0.0    0.0    99.9   99.9
+    recursiveCombat       Main                      run.hs:(64,1)-(81,45)                             318          0    0.0    0.0    99.9   99.9
+     recursiveCombat.go   Main                      run.hs:(66,9)-(72,57)                             319    1163835   82.2   44.0    99.9   99.9
+      recursiveCombat.go' Main                      run.hs:(75,9)-(81,45)                             320    1149783   17.3   54.4    17.8   55.9
+       int                Main                      run.hs:31:1-18                                    322          0    0.5    1.5     0.5    1.5
+      score               Main                      run.hs:58:1-60                                    323          0    0.0    0.0     0.0    0.0
