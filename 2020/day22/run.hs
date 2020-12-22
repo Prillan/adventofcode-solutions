@@ -20,7 +20,12 @@ import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
 
 import Control.Monad.State (State, evalState, get, put)
+import Data.Vector.Unboxed (Vector)
+import qualified Data.Vector.Unboxed as V
 
+import Control.Monad.State.Strict (State, evalState, get, put)
+
+import Control.Monad.Random
 type Deck = [Int]
 
 parse :: String -> Deck
@@ -53,18 +58,43 @@ score = sum . zipWith (*) [1..] . map fromIntegral . reverse
 data Winner = P1 | P2
   deriving (Show, Eq)
 
+
+type Zobrist = Int
+
+maxDeckSize = 70
+
+zobristMap :: Vector Zobrist
+zobristMap =
+  let n = maxDeckSize + 1
+      v = V.iterateNM (n * n) (const getRandom) 0
+  in V.force $ evalRand v (mkStdGen 42)
+
+zobrist :: Int -> Int -> Zobrist
+zobrist pos card = V.unsafeIndex zobristMap (card * (maxDeckSize + 1) + pos)
+
+stateToHash :: (Deck, Deck) -> Zobrist
+stateToHash (p1, p2) =
+  foldr xor 0 $ zipWith zobrist [0..] (p1 ++ [0] ++ p2)
+
+type SaveState = Zobrist
+
+toSaveState :: (Deck, Deck) -> SaveState
+toSaveState = stateToHash
+
 recursiveCombat :: (Deck, Deck) -> (Winner, Int)
-recursiveCombat = flip evalState Set.empty . go
-  where go :: (Deck, Deck) -> State (Set (Deck, Deck)) (Winner, Int)
+recursiveCombat start =
+  evalState (go start) IntSet.empty
+  where go :: (Deck, Deck) -> State IntSet (Winner, Int)
         go (p1, []) = pure (P1, score p1)
         go ([], p2) = pure (P2, score p2)
         go setup = do
-          !seen <- get
-          if setup `Set.member` seen
+          seen <- get
+          let !ss = toSaveState setup
+          if {-# SCC "memberCheck" #-} ss `IntSet.member` seen
             then pure (P1, score (fst setup))
-            else put (Set.insert setup seen) *> go' setup
+            else put (IntSet.insert ss seen) *> go' setup
 
-        go' :: (Deck, Deck) -> State (Set (Deck, Deck)) (Winner, Int)
+        go' :: (Deck, Deck) -> State IntSet (Winner, Int)
         go' (x:p1, y:p2)
           | x <= length p1 && y <= length p2 =
             case recursiveCombat (take x p1, take y p2) of
