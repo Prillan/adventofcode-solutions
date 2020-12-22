@@ -4,28 +4,16 @@
 import AoC
 import AoC.Grid
 
+import Control.Monad.Random
+import Control.Monad.State.Strict (State, evalState, get, put)
 import Data.Bits (xor)
-import Data.Ord (comparing)
-import Data.Bifunctor
-import Data.Maybe
+import qualified Data.IntSet as IntSet
+import Data.IntSet (IntSet)
 import Data.List
 import Data.List.Split (splitOn)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Sequence (Seq)
-import qualified Data.Sequence as Seq
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.IntSet (IntSet)
-import qualified Data.IntSet as IntSet
-
-import Control.Monad.State (State, evalState, get, put)
-import Data.Vector.Unboxed (Vector)
 import qualified Data.Vector.Unboxed as V
+import Data.Vector.Unboxed (Vector)
 
-import Control.Monad.State.Strict (State, evalState, get, put)
-
-import Control.Monad.Random
 type Deck = [Int]
 
 parse :: String -> Deck
@@ -61,16 +49,19 @@ data Winner = P1 | P2
 
 type Zobrist = Int
 
+
+maxDeckSize :: Int
 maxDeckSize = 70
 
 zobristMap :: Vector Zobrist
 zobristMap =
   let n = maxDeckSize + 1
-      v = V.iterateNM (n * n) (const getRandom) 0
+      v = V.replicateM (n * n) getRandom
   in V.force $ evalRand v (mkStdGen 42)
 
 zobrist :: Int -> Int -> Zobrist
-zobrist pos card = V.unsafeIndex zobristMap (card * (maxDeckSize + 1) + pos)
+zobrist pos card =
+  V.unsafeIndex zobristMap (card * (maxDeckSize + 1) + pos)
 
 stateToHash :: (Deck, Deck) -> Zobrist
 stateToHash (p1, p2) =
@@ -90,9 +81,10 @@ recursiveCombat start =
         go setup = do
           seen <- get
           let !ss = toSaveState setup
-          if {-# SCC "memberCheck" #-} ss `IntSet.member` seen
+          if ss `IntSet.member` seen
             then pure (P1, score (fst setup))
-            else put (IntSet.insert ss seen) *> go' setup
+            else put (IntSet.insert ss seen) *>
+                 go' setup
 
         go' :: (Deck, Deck) -> State IntSet (Winner, Int)
         go' (x:p1, y:p2)
