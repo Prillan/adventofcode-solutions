@@ -38,7 +38,7 @@ fixpoint f a =
 
 
 newtype V2 a = V2 (a, a)
-  deriving (Eq, Show, Functor)
+  deriving (Eq, Ord, Show, Functor)
 
 v2 = V2
 
@@ -64,7 +64,7 @@ extendY' y (V2 (x, z)) = V3 (x, y, z)
 extendZ' z (V2 (x, y)) = V3 (x, y, z)
 
 newtype V3 a = V3 (a, a, a)
-  deriving (Eq, Show, Functor)
+  deriving (Eq, Ord, Show, Functor)
 
 v3 = V3
 
