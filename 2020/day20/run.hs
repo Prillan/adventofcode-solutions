@@ -136,7 +136,6 @@ numberOfSeaMonsters =
 intify :: Tile -> [[Int]]
 intify = map (map fromEnum . map (== '#'))
 
-
 -- Convolution of (non-flipped) kernel on image.
 convolve :: [[Int]] -> [[Int]] -> [[Int]]
 convolve kernel image =

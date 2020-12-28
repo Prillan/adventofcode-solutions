@@ -94,7 +94,7 @@ rules m = loeb ss
         f :: Int -> Rule -> IntMap (Parser ()) -> Parser ()
         f i x m' =
           try
-          . foldl' (<|>) empty
+          . choice
           $ map (perChoice m') x
 
         perChoice :: IntMap (Parser ())
@@ -107,7 +107,7 @@ rules m = loeb ss
                 -> Term
                 -> Parser ()
         perTerm m' (Lit s) = char s *> pure ()
-        perTerm m' (Ref i) = m' IntMap.! i <?> "rule " ++ show i
+        perTerm m' (Ref i) = m' IntMap.! i
 
 loeb :: Functor a => a (a x -> x) -> a x
 loeb x = fmap (\a -> a (loeb x)) x
@@ -151,7 +151,7 @@ modified p42 p31 = do
   pure ()
 
 _0p :: Parser ()
-_0p = (dbg "_0 8" _8p) *> (dbg "_0 11" _11p) *> eof *> pure ()
+_0p = try (dbg "_0 8" _8p) *> try (dbg "_0 11" _11p) *> eof *> pure ()
 _8p = try (_42p *> _8p) <|> try _42p
 _11p = try (_42p *> _31p) <|> try (_42p *> _11p *> _31p)
 _42p = string "42"

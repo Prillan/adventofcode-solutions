@@ -13,10 +13,6 @@ import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
--- import Text.Megaparsec
--- import Text.Megaparsec.Char
-
--- type Parser = Parsec (ErrorItem Char) String
 
 type G = Set (Int, Int, Int)
 

@@ -6,26 +6,34 @@ shopt -s extglob
 YEAR=2020
 
 usage () {
-    echo 'usage: ./aoc DAY' >&2
+    echo 'usage: ./aoc <DAY> [YEAR]' >&2
+    echo '           | test-all [YEAR]' >&2
     exit 1
 }
 
 day () {
-    echo "Setting up day $1 ($YEAR)";
-    mkdir -p "$YEAR/day$1"
-    if ! [ -e "$YEAR/day$1/run.hs" ]; then
-        cp "template/run.hs" "$YEAR/day$1/"
+    if ! [ -z "$2" ]; then
+        YEAR="$2"
     fi
-    cd "$YEAR/day$1"
+    DAY="$1"
+    echo "Setting up day ${DAY} (${YEAR})";
+    mkdir -p "${YEAR}/day${DAY}"
+    if ! [ -e "${YEAR}/day${DAY}/run.hs" ]; then
+        cp "template/run.hs" "${YEAR}/day${DAY}/"
+    fi
+    cd "${YEAR}/day${DAY}"
     exec nix-shell ../../shell.nix --run "$SHELL"
 }
 
 testAll () {
-    YEAR=$YEAR nix-shell --run "./test-runner"
+    if ! [ -z "$1" ]; then
+        YEAR="$1"
+    fi
+    nix-shell --run "./test-runner $YEAR"
 }
 
 case $1 in
-    +([0-9])) day $1;;
-    test-all) testAll;;
+    +([0-9])) day $1 $2;;
+    test-all) testAll $2;;
     *) usage;;
 esac
