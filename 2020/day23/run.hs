@@ -1,158 +1,123 @@
 {-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NumericUnderscores #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
-import AoC
-import AoC.Grid
-
-import Data.Foldable (toList)
-import Data.Semigroup ((<>))
-import Data.Bits (xor)
-import Data.Ord (comparing)
-import Data.Bifunctor
-import Data.Maybe
+import Control.Monad (forM_)
+import Control.Monad.ST (ST, runST)
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.IntMap.Strict (IntMap)
-import qualified Data.IntMap.Strict as IntMap
-import Data.Sequence (Seq(Empty, (:<|), (:|>)))
-import qualified Data.Sequence as Seq
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.IntSet (IntSet)
-import qualified Data.IntSet as IntSet
-
+import Data.Maybe (mapMaybe)
 import Text.Read (readMaybe)
 
-parseAll = Seq.fromList
-           . mapMaybe (readMaybe @Cup . pure)
+import Data.Vector.Unboxed (Vector)
+import qualified Data.Vector.Unboxed as V
+
+import Data.Vector.Unboxed.Mutable (MVector)
+import qualified Data.Vector.Unboxed.Mutable as VM
 
 type Cup = Int
-type Cups = Seq Cup
+data Cups = Cups { cups :: !(Vector Int)
+                 , currentCup :: !Cup
+                 , lastCup :: !Cup }
+  deriving (Show, Eq)
 
-cupMin :: Cup
-cupMin = 1
-
-insertAfter :: Cups -> Cup -> Cups -> Cups
-insertAfter els dest xs =
-  case Seq.breakl (== dest) xs of
-    (before, _ :<| after) -> before <> (dest :<| els) <> after
-    (before, Empty)       -> error "asdf"
-
-insertAfter' :: Cups -> Cup -> Cups -> Maybe Cups
-insertAfter' els dest xs =
-  case Seq.breakl (== dest) xs of
-    (before, _ :<| after) -> Just $ before <> (dest :<| els) <> after
-    (before, Empty)       -> Nothing
+parseAll :: String -> [Cup]
+parseAll = mapMaybe (readMaybe @Cup . pure)
 
 
-rotateTo :: Cups -> Cup -> Cups
-rotateTo xs t =
-  Seq.take (Seq.length xs)
-  $ Seq.dropWhileL (/= t) (xs <> xs)
+setup :: Cup -> [Cup] -> Cups
+setup maxCup cs =
+  let l = maxCup - 1
+      c = head cs - 1
+      wrap | length cs == maxCup = (last shifted, head shifted)
+           | otherwise           = (l, c)
+      glue | length cs == maxCup = (last shifted, head shifted)
+           | otherwise           = (last shifted, maximum shifted + 1)
+      base = V.enumFromN 1 maxCup
+      shifted = map (\x -> x - 1) cs
+      firstPart =
+        wrap:glue:zip shifted (drop 1 shifted)
+      v = V.modify (flip update firstPart) base
+  in Cups v c (fst wrap)
 
-move :: Cup -> Cups -> Cups
-move cupMax (curr :<| c1 :<| c2 :<| c3 :<| rest) =
-  let dests = filter (\x -> x /= c1 && x /= c2 && x /= c3)
-              . drop 1
-              $ iterate (\case 1 -> cupMax
-                               x -> x - 1) curr
-      dest = head dests
-      result = insertAfter [c1, c2, c3] dest (rest :|> curr)
+
+cupsToList :: Cups -> [Cup]
+cupsToList c = cupsToList' (1 + currentCup c) c
+
+cupsToList' :: Cup -> Cups -> [Cup]
+cupsToList' root Cups {..} =
+  let cs = map (+1) $ iterate' (cups V.!) (root - 1)
+  in root:takeWhile (/= root) (drop 1 cs)
+
+update :: MVector s Int -> [(Int, Int)] -> ST s ()
+update mv toUpdate =
+  forM_ toUpdate $ \(from, to) -> VM.write mv from to
+
+readN :: Int -> Int -> MVector s Int -> ST s [Int]
+readN n sidx v = go [] sidx n v
+  where go acc   _ 0  _ = pure (sidx:reverse acc)
+        go acc idx i cs = do
+          idx' <- VM.read cs idx
+          go (idx':acc) idx' (i - 1) cs
+
+moveN :: Int -> Cup -> Cups -> ST s Cups
+moveN n cupMax Cups {..} = V.thaw cups >>= go n currentCup lastCup
+  where go :: Int -> Int -> Int -> MVector s Int -> ST s Cups
+        go 0 curr l cs = Cups <$> V.freeze cs <*> pure curr <*> pure l
+        go i curr l cs = do
+          _:c1:c2:c3:_ <- readN 4 curr cs
+          let dests = filter (\x -> x /= c1 && x /= c2 && x /= c3)
+                      . drop 1
+                      $ iterate (\case 0 -> cupMax - 1
+                                       x -> x - 1) curr
+              dest = head dests
+          afterDest <- VM.read cs dest
+          afterC3 <- VM.read cs c3
+          let toInsert :: [(Int, Int)]
+              toInsert
+                | dest == l =
+                  [ (dest, c1)
+                  , (c3, curr)
+                  , (curr, afterC3) ]
+                | otherwise =
+                  [ (dest, c1)
+                  , (c3, afterDest)
+                  , (l, curr)
+                  , (curr, afterC3) ]
+              last' = curr
+              curr' = afterC3
+          update cs toInsert
+          go (i - 1) curr' last' cs
+
+part1 :: [Cup] -> String
+part1 input =
+  let final = runST $ moveN 100
+                            (maximum input)
+                            (setup (length input) input)
+      result = concatMap show
+               . drop 1
+               $ cupsToList' 1 final
   in result
 
-part1 input =
-  let final = iterate (move (maximum input)) input !! 100
-      final' = iterate (move2 (maximum input)) (asIntMap $ toList input) !! 100
-
-      result = concatMap show
-               . Seq.drop 1
-               $ final `rotateTo` 1
-      result' = concatMap show
-                . Seq.drop 1
-                . flip rotateTo 1
-                $ Seq.fromList (fromCupsV2 final')
-  in (result, result')
-
-data CupsV2 = CupsV2 { cups :: !(IntMap Cup)
-                     , currentCup :: !Cup
-                     , lastCup :: !Cup }
-  deriving Show
-
-move2 :: Cup -> CupsV2 -> CupsV2
-move2 cupMax CupsV2 {..} =
-  let _:c1:c2:c3:_ = iterate (cups IntMap.!) currentCup
-      dests = filter (\x -> x /= c1 && x /= c2 && x /= c3)
-              . drop 1
-              $ iterate (\case 1 -> cupMax
-                               x -> x - 1) currentCup
-      dest = head dests
-      afterDest = cups IntMap.! dest
-      afterC3 = cups IntMap.! c3
-      -- curr
-      -- -> c1
-      -- -> c2
-      -- -> c3
-      -- -> afterC3
-      -- -> ...
-      -- -> dest
-      -- -> afterDest
-      -- -> ...
-      -- -> last
-
-      -- afterC3
-      -- -> ...
-      -- -> dest *
-      -- -> c1
-      -- -> c2
-      -- -> c3 *
-      -- -> afterDest
-      -- -> ...
-      -- -> last *
-      -- -> curr *
-      toInsert
-        | dest == lastCup =
-            IntMap.fromList [ (dest, c1)
-                            , (c3, currentCup)
-                            , (currentCup, afterC3) ]
-        | otherwise =
-            IntMap.fromList [ (dest, c1)
-                            , (c3, afterDest)
-                            , (lastCup, currentCup)
-                            , (currentCup, afterC3) ]
-      last' = currentCup
-      curr' = afterC3
-      result = IntMap.union toInsert cups
-      cs = CupsV2 result curr' last'
-  in cs
-
-asIntMap :: [Cup] -> CupsV2
-asIntMap xs =
-  let l = last xs
-      c = head xs
-      cs = IntMap.fromList $ (last xs, head xs):zip xs (drop 1 xs)
-  in CupsV2 cs c l
-
-fromCupsV2 :: CupsV2 -> [Cup]
-fromCupsV2 CupsV2 {..} =
-  let cs = iterate' (cups IntMap.!) currentCup
-  in currentCup:takeWhile (/= currentCup) (drop 1 cs)
-
+part2 :: [Cup] -> Int
 part2 input =
   let end = 1_000_000
-      start = 10
-      initial = input <> Seq.iterateN (1 + end - start) (+1) start
-      CupsV2 { cups = final}
-        = iterate' (move2 end) (asIntMap $ toList initial) !! 10_000_000
-  in product $ take 3 (iterate (final IntMap.!) 1)
+      final = runST $ moveN 10_000_000
+                            end
+                            (setup end input)
+      result = take 2
+               . drop 1
+               $ cupsToList' 1 final
+  in product result
 
+main :: IO ()
 main = main' "input.txt"
+
+exampleMain :: IO ()
 exampleMain = main' "example.txt"
 
+main' :: FilePath -> IO ()
 main' file = do
    input <- parseAll <$> readFile file
-   print (part1 input)
+   putStrLn (part1 input)
    print (part2 input)
