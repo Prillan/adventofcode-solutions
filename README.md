@@ -1,4 +1,4 @@
-Solutions to [[https://adventofcode.com/][Advent of Code]] problems in
+Solutions to [Advent of Code](https://adventofcode.com/) problems in
 Haskell. Some problems have also been solved in other languages. All
 solutions are noted below.
 
