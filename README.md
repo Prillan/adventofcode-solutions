@@ -11,7 +11,7 @@ solutions are noted below.
 | 2017 | ✓                   |             |
 | 2018 | ~12 days            |             |
 | 2019 | ~13 days            |             |
-| 2020 | ✓                   | 1/25        |
+| 2020 | ✓                   | 2/25        |
 
 ## Running the Code
 
@@ -78,7 +78,7 @@ I only do the ones I feel like for asm.
 
 | Day \ Year | 2020                      |
 |------------|---------------------------|
-| 1          |                           |
+| 1          | [✓](./2020/day1/run.asm)  |
 | 2          |                           |
 | 3          |                           |
 | 4          |                           |
