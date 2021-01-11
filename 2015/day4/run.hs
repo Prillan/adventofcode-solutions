@@ -3,13 +3,17 @@ import qualified Data.ByteString.Char8 as B
 import Crypto.Hash
 import Data.Semigroup ((<>))
 
-privateKey :: B.ByteString
+privateKey :: String
 privateKey = "yzbqklnj"
 
-candidates = map (\i -> privateKey <> (B.pack $ show i)) $ [(1 :: Integer)..]
+hashZeroes n i =
+  let c = B.pack $ privateKey <> show i
+      h = hash c :: Digest MD5
+  in all (== '0') . take n . show $ h
 
-process = filter (all (== '0') . take 5 . show . snd)
-        . map (\c -> (c, hash c :: Digest MD5)) $ candidates
+part1 = filter (hashZeroes 5) [0..]
+part2 = filter (hashZeroes 6) part1
 
 main = do
-   print (head process)
+  print (head part1)
+  print (head part2)

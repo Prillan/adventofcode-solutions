@@ -33,10 +33,17 @@ day () {
         *) usage ;;
     esac
 
+    extra_arg=()
+    if [ -e "./extra.nix" ]; then
+        extra_arg=("--arg" "extraDeps" "import ./extra.nix")
+    fi
+
     exec nix-shell \
          ../../shell.nix \
          --argstr lang "$AOC_LANG" \
-         --run "$SHELL"
+         --run "$SHELL" \
+         "${extra_arg[@]}"
+    exit 0
 }
 
 testAll () {

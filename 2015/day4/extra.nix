@@ -1,0 +1,5 @@
+{
+  hs = hpkgs: [
+    hpkgs.cryptonite
+  ];
+}

@@ -21,8 +21,14 @@ paper :: Box -> Integer
 paper Box{..} = sum (map (2*) sides) + minimum sides
   where sides = [w*l, l*h, w*h]
 
-process = sum . map paper . mapMaybe readBox . lines
+ribbon :: Box -> Integer
+ribbon Box{..} = minimum sides + (w*l*h)
+    where sides = map (*2) [w+l, l+h, w+h]
+
+part1 = sum . map paper . mapMaybe readBox . lines
+part2 = sum . map ribbon . mapMaybe readBox . lines
 
 main = do
-   input <- readFile "input.txt"
-   print (process input)
+  input <- readFile "input.txt"
+  print (part1 input)
+  print (part2 input)

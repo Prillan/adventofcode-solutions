@@ -43,33 +43,33 @@ NASM version 2.14.02 compiled on Jan  1 1980
 
 Note: 2015-2019 need some cleanup first.
 
-| Day \ Year | 2015 | 2016 | 2017 | 2018 | 2019 | 2020                     |
-|------------|------|------|------|------|------|--------------------------|
-| 1          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day1/run.hs)  |
-| 2          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day2/run.hs)  |
-| 3          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day3/run.hs)  |
-| 4          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day4/run.hs)  |
-| 5          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day5/run.hs)  |
-| 6          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day6/run.hs)  |
-| 7          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day7/run.hs)  |
-| 8          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day8/run.hs)  |
-| 9          | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day9/run.hs)  |
-| 10         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day10/run.hs) |
-| 11         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day11/run.hs) |
-| 12         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day12/run.hs) |
-| 13         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day13/run.hs) |
-| 14         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day14/run.hs) |
-| 15         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day15/run.hs) |
-| 16         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day16/run.hs) |
-| 17         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day17/run.hs) |
-| 18         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day18/run.hs) |
-| 19         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day19/run.hs) |
-| 20         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day20/run.hs) |
-| 21         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day21/run.hs) |
-| 22         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day22/run.hs) |
-| 23         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day23/run.hs) |
-| 24         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day24/run.hs) |
-| 25         | TBA  | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day25/run.hs) |
+| Day \ Year | 2015                    | 2016 | 2017 | 2018 | 2019 | 2020                     |
+|------------|-------------------------|------|------|------|------|--------------------------|
+| 1          | [✓](./2015/day1/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day1/run.hs)  |
+| 2          | [✓](./2015/day2/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day2/run.hs)  |
+| 3          | [✓](./2015/day3/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day3/run.hs)  |
+| 4          | [✓](./2015/day4/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day4/run.hs)  |
+| 5          | [✓](./2015/day5/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day5/run.hs)  |
+| 6          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day6/run.hs)  |
+| 7          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day7/run.hs)  |
+| 8          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day8/run.hs)  |
+| 9          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day9/run.hs)  |
+| 10         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day10/run.hs) |
+| 11         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day11/run.hs) |
+| 12         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day12/run.hs) |
+| 13         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day13/run.hs) |
+| 14         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day14/run.hs) |
+| 15         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day15/run.hs) |
+| 16         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day16/run.hs) |
+| 17         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day17/run.hs) |
+| 18         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day18/run.hs) |
+| 19         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day19/run.hs) |
+| 20         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day20/run.hs) |
+| 21         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day21/run.hs) |
+| 22         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day22/run.hs) |
+| 23         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day23/run.hs) |
+| 24         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day24/run.hs) |
+| 25         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day25/run.hs) |
 
 
 ### ASM
