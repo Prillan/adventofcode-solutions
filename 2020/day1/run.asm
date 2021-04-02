@@ -187,6 +187,7 @@ writeResultWrite:
         lea       rsi, [rsp+rbx+1]        ; address of string to output
         mov       rdx, MAX_DIGITS + 1     ; number of bytes
         sub       rdx, rbx
+        sub       rdx, 1
         syscall                           ; invoke operating system to do the write
         add       rsp, MAX_DIGITS + 1
         ret
