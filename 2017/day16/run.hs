@@ -4,13 +4,15 @@ import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Sequence (Seq, update, (!?), (><))
 import qualified Data.Sequence as Seq
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
 unsafeRight (Left x) = error $ show x
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 type Program = Char
 
 data Action = Spin Int
@@ -23,7 +25,7 @@ numP = read <$> some digitChar
 actionP = spinP <|> exchangeP <|> partnerP
 spinP = Spin <$> (char 's' *> numP)
 exchangeP = Exchange <$> (char 'x' *> numP) <*> (char '/' *> numP)
-partnerP = Partner <$> (char 'p' *> anyChar) <*> (char '/' *> anyChar)
+partnerP = Partner <$> (char 'p' *> asciiChar) <*> (char '/' *> asciiChar)
 
 parser :: Parser [Action]
 parser = sepBy1 actionP (char ',')

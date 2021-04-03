@@ -2,9 +2,12 @@
 import Control.Applicative (liftA2, some, (<|>))
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import Text.Megaparsec (Parsec, Dec, char, parse)
+import Data.Void (Void)
+import Text.Megaparsec hiding (some)
+import Text.Megaparsec.Char
 
-type Parser = Parsec Dec String
+
+type Parser = Parsec Void String
 
 rowP :: Parser [Bool]
 rowP = some $ (char '.' *> pure False) <|> (char '#' *> pure True)

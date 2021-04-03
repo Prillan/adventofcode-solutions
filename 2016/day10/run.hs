@@ -3,7 +3,9 @@ import           Data.Bifunctor
 import           Data.List (sort)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
-import           Text.Megaparsec hiding (State)
+import           Text.Megaparsec hiding (State, empty)
+import           Text.Megaparsec.Char
+import           Data.Void (Void)
 
 unsafeRight (Right x) = x
 
@@ -46,7 +48,7 @@ moveP = move <$> (string "bot " *> num)
 targetP = O <$> (string "output " *> num)
       <|> B <$> (string "bot " *> num)
 
-inst :: Parsec Dec String Inst
+inst :: Parsec Void String Inst
 inst = insertP <|> moveP
 
 parseAll = map unsafeRight .

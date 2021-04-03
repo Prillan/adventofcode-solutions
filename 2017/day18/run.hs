@@ -15,19 +15,11 @@ import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Control.Monad.State
-import Text.Megaparsec ( Parsec
-                       , anyChar
-                       , digitChar
-                       , string
-                       , parse
-                       , Dec
-                       , spaceChar
-                       , (<|>)
-                       , some
-                       , optional
-                       , char )
+import Data.Void (Void)
+import Text.Megaparsec hiding (State)
+import Text.Megaparsec.Char
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
@@ -82,7 +74,7 @@ numP = do
   pure $ sign * num
 
 regValP :: Parser (Program Integer)
-regValP = (pure <$> numP) <|> (gets . reg <$> anyChar)
+regValP = (pure <$> numP) <|> (gets . reg <$> asciiChar)
 
 operation :: (Integer -> Integer -> Integer)
           -> Reg
@@ -99,7 +91,7 @@ operationP :: (Integer -> Integer -> Integer)
 operationP op s = do
   string s
   spaceChar
-  x <- anyChar
+  x <- asciiChar
   spaceChar
   y <- regValP
   pure $ operation op x y
@@ -107,7 +99,7 @@ operationP op s = do
 sndP :: Parser (Program ())
 sndP = do
   string "snd "
-  reg <- anyChar
+  reg <- asciiChar
   pure $ play reg
 
 rcvP :: Parser (Program ())
@@ -141,7 +133,7 @@ jgzP = do
 setP :: Parser (Program ())
 setP = do
   string "set "
-  x <- anyChar
+  x <- asciiChar
   spaceChar
   y <- regValP
   pure $ do

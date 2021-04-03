@@ -10,7 +10,9 @@ import           Data.PriorityQueue.FingerTree (PQueue)
 import qualified Data.PriorityQueue.FingerTree as PQueue
 import           Data.Set (Set)
 import qualified Data.Set as Set
-import           Text.Megaparsec hiding (State)
+import           Data.Void (Void)
+import           Text.Megaparsec hiding (State, empty)
+import           Text.Megaparsec.Char
 import Debug.Trace (trace)
 data Node = Node { size :: {-# UNPACK #-} !Int
                  , used :: {-# UNPACK #-} !Int
@@ -24,7 +26,7 @@ nodeP = Node <$> (some spaceChar *> numP <* string "T")
 nodeNameP = (,) <$> (string "/dev/grid/node-x" *> numP)
                 <*> (string "-y" *> numP)
 
-lineP :: Parsec Dec String ((Int, Int), Node)
+lineP :: Parsec Void String ((Int, Int), Node)
 lineP = (,) <$> nodeNameP <*> nodeP
 
 unsafeRight (Right x) = x

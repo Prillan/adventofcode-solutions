@@ -1,10 +1,12 @@
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
 unsafeRight (Left x) = error $ show x
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 num :: Parser Int
 num = read <$> some digitChar

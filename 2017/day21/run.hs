@@ -10,10 +10,12 @@ import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Text.Megaparsec
 import Data.Semigroup
+import Data.Void (Void)
+import Text.Megaparsec
+import Text.Megaparsec.Char
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 rowP :: Parser [Bool]
 rowP = some $ (char '.' *> pure False) <|> (char '#' *> pure True)

@@ -1,7 +1,9 @@
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import           Data.Void (Void)
 import           Text.Megaparsec hiding (State)
+import           Text.Megaparsec.Char
 
 type Reg = Char
 type Val = Int
@@ -29,7 +31,7 @@ incP =
 decP =
   Dec <$> (string "dec " *> regP)
 
-instrP :: Parsec Dec String Instr
+instrP :: Parsec Void String Instr
 instrP = cpyP <|> jnzP <|> incP <|> decP
 
 

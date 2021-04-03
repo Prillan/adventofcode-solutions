@@ -17,9 +17,9 @@ unsafeRight (Left x) = error $ show x
 stepP :: Parser Step
 stepP = do
   string "Step "
-  from <- anyChar
+  from <- asciiChar
   string " must be finished before step "
-  to <- anyChar
+  to <- asciiChar
   string " can begin."
   pure (from, to)
 

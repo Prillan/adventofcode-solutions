@@ -2,9 +2,11 @@
 import Data.Ord (comparing)
 import Data.List (maximumBy, nub, sort)
 import Data.Semigroup ((<>))
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x

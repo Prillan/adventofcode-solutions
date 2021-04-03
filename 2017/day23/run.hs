@@ -1,19 +1,11 @@
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Control.Monad.State
-import Text.Megaparsec ( Parsec
-                       , anyChar
-                       , digitChar
-                       , string
-                       , parse
-                       , Dec
-                       , spaceChar
-                       , (<|>)
-                       , some
-                       , optional
-                       , char )
+import Data.Void (Void)
+import Text.Megaparsec hiding (State)
+import Text.Megaparsec.Char
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
@@ -56,7 +48,7 @@ numP = do
   pure $ sign * num
 
 regValP :: Parser (Program Integer)
-regValP = (pure <$> numP) <|> (gets . reg <$> anyChar)
+regValP = (pure <$> numP) <|> (gets . reg <$> asciiChar)
 
 operation :: (Integer -> Integer -> Integer)
           -> Reg
@@ -73,7 +65,7 @@ operationP :: (Integer -> Integer -> Integer)
 operationP op str = do
   string str
   spaceChar
-  x <- anyChar
+  x <- asciiChar
   spaceChar
   y <- regValP
   pure $ do
@@ -98,7 +90,7 @@ jnzP = do
 setP :: Parser (Program ())
 setP = do
   string "set "
-  x <- anyChar
+  x <- asciiChar
   spaceChar
   y <- regValP
   pure $ do

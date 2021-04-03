@@ -1,6 +1,8 @@
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 right :: (Show a) => Either a b -> b
 right (Left x) = error $ show x
@@ -28,10 +30,10 @@ eat = eat' 0
 
 eat' :: Int -> Parser Int
 eat' i = do
-  c <- anyChar
+  c <- asciiChar
   case c of
     '>' -> pure i
-    '!' -> anyChar *> eat' i
+    '!' -> asciiChar *> eat' i
     _   -> eat' (i + 1)
 
 streamP :: Parser DataStream

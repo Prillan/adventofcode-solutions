@@ -4,7 +4,9 @@ import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import           Pipes
 import qualified Pipes.Prelude as P
+import           Data.Void (Void)
 import           Text.Megaparsec hiding (State)
+import           Text.Megaparsec.Char
 
 type Reg = Char
 type Val = Int
@@ -43,7 +45,7 @@ tglP =
 outP =
   Out <$> (string "out " *> valRegP)
 
-instrP :: Parsec Dec String Instr
+instrP :: Parsec Void String Instr
 instrP = cpyP <|> jnzP <|> incP <|> decP <|> tglP <|> outP
 
 unsafeRight (Right x) = x

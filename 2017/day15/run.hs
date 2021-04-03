@@ -11,11 +11,11 @@ multiplesB = 8
 
 generate :: Word64 -> Word64 -> [Word64]
 generate seed factor =
-  iterate (\x -> (x * factor) `mod` (2 ^ 31 - 1)) seed
+  map ((2 ^ 16 - 1) .&.)
+  . iterate (\x -> (x * factor) `mod` (2 ^ 31 - 1)) $ seed
 
 equal :: [Word64] -> [Word64] -> [Bool]
-equal genA genB = drop 1 $ zipWith (==) (map first16 genA) (map first16 genB)
-  where first16 = ((2 ^ 16 - 1) .&.)
+equal genA genB = drop 1 $ zipWith (==) genA genB
 
 part1 :: Word64 -> Word64 -> Int
 part1 seedA seedB = length

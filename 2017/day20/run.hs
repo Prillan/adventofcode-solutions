@@ -1,11 +1,13 @@
-import Data.Foldable
 import Control.Applicative
+import Data.Foldable
 import Data.Ord
 import Data.List (sort)
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Text.Megaparsec
+import Text.Megaparsec hiding (some)
+import Text.Megaparsec.Char
 import Data.Ratio
+import Data.Void (Void)
 
 newtype V3 a = V3 { asTuple :: (a, a, a) }
   deriving (Show, Eq, Ord)
@@ -29,10 +31,6 @@ instance Num a => Num (V3 a) where
 k *. v = fmap (k *) v
 {-# SPECIALISE (*.) :: Rational -> V3 Rational -> V3 Rational #-}
 
-instance Fractional a => Fractional (V3 a) where
-  (/) = liftA2 (/)
-  fromRational = pure . fromRational
-
 manhattan :: Num a => V3 a -> a
 manhattan (V3 (x, y, z)) = abs x + abs y + abs z
 {-# SPECIALISE manhattan :: V3 Rational -> Rational #-}
@@ -45,7 +43,7 @@ data Particle a = Particle { pos :: !(V3 a)
 instance Functor Particle where
   fmap f (Particle p v a) = Particle (fmap f p) (fmap f v) (fmap f a)
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x

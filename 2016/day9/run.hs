@@ -1,9 +1,11 @@
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
-num :: Parsec Dec String Int
+num :: Parsec Void String Int
 num = read <$> some digitChar
 
-marker :: Parsec Dec String (Int, Int)
+marker :: Parsec Void String (Int, Int)
 marker = between (char '(')
                  (char ')')
                  ((,) <$> (num <* char 'x') <*> num)

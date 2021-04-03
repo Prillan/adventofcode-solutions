@@ -6,7 +6,9 @@ import Data.Sequence ( Seq
                      , (><)
                      )
 import qualified Data.Sequence as Seq
+import           Data.Void (Void)
 import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
 
 data Dir = R | L
@@ -26,19 +28,19 @@ numP = read <$> some digitChar
 
 swapPosP = SwapPos <$> (string "swap position " *> numP)
                    <*> (string " with position " *> numP)
-swapLetterP = SwapLetter <$> (string "swap letter " *> anyChar)
-                         <*> (string " with letter " *> anyChar)
+swapLetterP = SwapLetter <$> (string "swap letter " *> asciiChar)
+                         <*> (string " with letter " *> asciiChar)
 rotateP = Rotate <$> (string "rotate " *> dirP)
                  <*> (char ' ' *> numP <* string " step")
   where dirP = (string "left" *> pure L)
            <|> (string "right" *> pure R)
-rotatePosP = RotatePos <$> (string "rotate based on position of letter " *> anyChar)
+rotatePosP = RotatePos <$> (string "rotate based on position of letter " *> asciiChar)
 revP = Rev <$> (string "reverse positions " *> numP)
            <*> (string " through " *> numP)
 moveP = Move <$> (string "move position " *> numP)
              <*> (string " to position " *> numP)
 
-instP :: Parsec Dec String Inst
+instP :: Parsec Void String Inst
 instP = swapPosP
     <|> swapLetterP
     <|> try rotateP

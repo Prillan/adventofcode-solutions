@@ -5,7 +5,9 @@ import Data.Ord (comparing)
 import Data.Map (Map)
 import qualified Data.Map as Map
 
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
 data Inst = Inst Op Reg Int Cond
 
@@ -27,7 +29,7 @@ data Cond = Cond Reg CompOp
 
 type CompOp = Int -> Bool
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 
 rights = map f
   where f (Left x) = error $ show x

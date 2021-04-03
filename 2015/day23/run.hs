@@ -2,7 +2,9 @@ import           Control.Monad.State
 import           Control.Lens
 import           Data.Vector ((!?))
 import qualified Data.Vector as V
-import           Text.Parsec
+import           Data.Void (Void)
+import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
 import ProgramState
 
@@ -19,12 +21,16 @@ data Instruction = JIO !Register !Offset
                  | JIE !Register !Offset
   deriving (Show, Eq)
 
-offset = toInt <$> oneOf "+-" <*> many1 digit
+type Parser = Parsec Void String
+
+offset :: Parser Int
+offset = toInt <$> oneOf "+-" <*> some digitChar
   where toInt x xs
           | x == '+' = read xs
           | otherwise = read (x:xs)
 register = (\x -> if x == 'a' then RA else RB) <$> oneOf "ab"
 
+instruction :: Parser Instruction
 instruction =
   choice $ map try [ jif JIO "jio"
                    , jif JIE "jie"
@@ -33,8 +39,11 @@ instruction =
                    , mod INC "inc"
                    , mod TPL "tpl"
                    ]
-  where mod sym str = sym <$> (string (str ++ " ") *> register)
+  where mod :: (Register -> Instruction) -> String -> Parser Instruction
+        mod sym str = sym <$> (string (str ++ " ") *> register)
+        jmp :: (Int -> Instruction) -> String -> Parser Instruction
         jmp sym str = sym <$> (string (str ++ " ") *> offset)
+        jif :: (Register -> Int -> Instruction) -> String -> Parser Instruction
         jif sym str = sym <$> (string (str ++ " ") *> register) <*> (string ", " *> offset)
 
 unsafeRight (Right x) = x

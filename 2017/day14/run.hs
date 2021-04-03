@@ -75,7 +75,11 @@ groups s = groups' (toList s)
 
 neighbours :: (Int, Int) -> [(Int, Int)]
 neighbours (x, y) =
-  [(x + x', y + y') | x' <- [-1, 0,  1], y' <- [-1, 0,  1], abs x' /= abs y']
+  [ (x + 1, y    )
+  , (x - 1, y    )
+  , (x    , y + 1)
+  , (x    , y - 1) ]
+
 
 findAll :: Set (Int, Int) -> (Int, Int) -> (Set (Int, Int), Set (Int, Int))
 findAll s c = findAll' [c] (Set.empty) (Set.singleton c)

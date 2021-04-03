@@ -1,15 +1,17 @@
-import Data.Maybe (maybeToList)
+import Data.Maybe (maybe)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
+import Data.Void (Void)
 import Text.Megaparsec
+import Text.Megaparsec.Char
 
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
 unsafeRight (Left x) = error $ show x
 
-type Parser = Parsec Dec String
+type Parser = Parsec Void String
 num :: Parser Int
 num = read <$> some digitChar
 
@@ -28,8 +30,7 @@ collect g input = collect' (Set.singleton g)
   where collect' s =
           let s' = Set.union s $ Set.fromList $ do
                 e <- Set.toList s
-                xs <- maybeToList $ Map.lookup e input
-                xs
+                maybe [] id (Map.lookup e input)
           in
             if s' == s
             then s

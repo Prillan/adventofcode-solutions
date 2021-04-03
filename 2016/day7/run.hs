@@ -1,5 +1,7 @@
 import           Data.List (isInfixOf)
+import           Data.Void (Void)
 import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
 unsafeRight :: Either a b -> b
 unsafeRight (Right x) = x
@@ -19,7 +21,7 @@ normals ip = do
   Normal v <- toSegments ip
   pure v
 
-parseIPv7 :: Parsec Dec String IPv7
+parseIPv7 :: Parsec Void String IPv7
 parseIPv7 = IPv7 <$> some (hypernet <|> normal)
   where str = some letterChar
         normal = Normal <$> str
