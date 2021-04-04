@@ -159,10 +159,13 @@ writePart2:
         mov     ebx, [buffer + rbx*4]
         add     rbx, 1
         mul     rbx
-writePart2write:
+writeResult:
         ;; Now we have our answer in rax, write it out
-        mov     rbx, 15                 ; max 12 digits really, but lets use 16
+        %define MAX_DIGITS 64 ; max 64 digits, pretty arbitrary
+        sub     rsp, MAX_DIGITS + 1
+        mov     rbx, MAX_DIGITS
         mov     BYTE [rsp + rbx], 0x0a  ; newline!
+        sub     rbx, 1
         mov     rcx, 10                 ; divisor
 itoaLoop:
         xor     rdx, rdx        ; clear upper part of dividend
@@ -174,19 +177,20 @@ itoaLoop:
         mov     BYTE [rsp + rbx], dl
         sub     rbx, 1
         cmp     rbx, 0          ; if we've reached all digits, stop
-        je      part2ActualWrite
+        je      writeResultWrite
         cmp     rax, 0          ; if the quotient is 0, stop
-        je      part2ActualWrite
+        je      writeResultWrite
         jmp     itoaLoop
-
-part2ActualWrite:
+writeResultWrite:
         ;; Write to stdout
         mov       rax, 1                  ; system call for write
         mov       rdi, 1                  ; file handle 1 is stdout
-        lea       rsi, [rsp+rbx]          ; address of string to output
-        mov       rdx, 16                 ; number of bytes
+        lea       rsi, [rsp+rbx+1]        ; address of string to output
+        mov       rdx, MAX_DIGITS + 1     ; number of bytes
         sub       rdx, rbx
+        sub       rdx, 1
         syscall                           ; invoke operating system to do the write
+        add       rsp, MAX_DIGITS + 1
         add       rsp, 0x20
         ret
 
