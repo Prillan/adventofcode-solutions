@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 import Data.Maybe (maybe)
-import Data.List (maximumBy, nub)
+import Data.List (nub)
 import Data.Ord (comparing)
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -82,8 +82,8 @@ eval = scanl step Map.empty
               Map.insertWith (\_ o -> f o) r (f 0) m
           | otherwise = m
 
-part1 = maximumBy (comparing snd) . Map.toList . last . eval
-part2 = maximumBy (comparing snd) . concatMap Map.toList . eval
+part1 = maximum . map snd . Map.toList . last . eval
+part2 = maximum . map snd . concatMap Map.toList . eval
 
 main = do
   input <- parseAll <$> readFile "input.txt"

@@ -41,5 +41,5 @@ part2 = filter (flip matches2 machineOutput)
 
 main = do
    input <- parseAll <$> readFile "input.txt"
-   mapM_ print (part1 input)
-   mapM_ print (part2 input)
+   mapM_ (print . sueIndex) (part1 input)
+   mapM_ (print . sueIndex) (part2 input)

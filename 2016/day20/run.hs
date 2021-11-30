@@ -15,7 +15,7 @@ step vals n = foldr blacklist n vals
 part1 input =
   let vals = iterate (step input) 0
   in
-    head . filter (uncurry (==)) $ zip vals (tail vals)
+    fst . head . filter (uncurry (==)) $ zip vals (tail vals)
 
 tpl [x, y] = (x, y)
 

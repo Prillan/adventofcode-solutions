@@ -98,5 +98,5 @@ part2 graph = go 0 [] (allNodes graph) graph
 main :: IO ()
 main = do
   input <- parseAll <$> readFile "input.txt"
-  print (part1 input)
+  putStrLn (part1 input)
   print (part2 input)

@@ -92,5 +92,5 @@ main :: IO ()
 main = do
    input <- parseAll <$> readFile "input.txt"
    let (seen, steps) = pathStats input
-   putStrLn $ "Seen:  " ++ seen
-   putStrLn $ "Steps: " ++ show steps
+   putStrLn $ seen
+   putStrLn $ show steps

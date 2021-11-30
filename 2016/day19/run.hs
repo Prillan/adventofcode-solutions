@@ -16,8 +16,11 @@ input = 3012210
 single [x] = True
 single _ = False
 
-part1 :: (Int, [Int])
-part1 = until (single.snd) step' (input, [1..input])
+part1 :: Int
+part1 = head
+        . snd
+        . until (single . snd) step'
+        $ (input, [1..input])
 
 step2 seq =
   case (Seq.viewl seq) of
@@ -30,8 +33,11 @@ step2 seq =
 
 single' = (== 1).Seq.length
 
-part2 :: [Int]
-part2 = toList . until single' step2 $ Seq.fromList [1..input]
+part2 :: Int
+part2 = head
+        . toList
+        . until single' step2
+        $ Seq.fromList [1..input]
 
 main = do
    print part1

@@ -52,9 +52,10 @@ keys f =
   in go initial 0
 
 part1Input = "ahsbgdzn"
-part1 = keys md5'
-part2 = keys iterated
+part1 = let (ans, _, _) = keys md5' !! 63 in ans
+part2 = let (ans, _, _) = keys iterated !! 63 in ans
 
+-- TODO: Performance
 main = do
-  mapM_ print $ zip [1..64] part1
-  mapM_ print $ zip [1..64] part2
+  print part1
+  print part2

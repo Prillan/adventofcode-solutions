@@ -51,4 +51,4 @@ main :: IO ()
 main = do
   input <- filter (/= '\n') <$> readFile "input.txt"
   print $ part1 . read $ "[" ++ input ++ "]"
-  print $ part2 input
+  putStrLn $ part2 input

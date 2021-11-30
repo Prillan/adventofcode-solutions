@@ -54,10 +54,5 @@ result2 s = show (left s) ++ ","
 main :: IO ()
 main = do
   let input = 5535
-
-  let r1 = part1 input
-  print r1
-  putStrLn (result1 r1)
-  let r2 = part2 input
-  print r2
-  putStrLn (result2 r2)
+  putStrLn . result1 . part1 $ input
+  putStrLn . result2 . part2 $ input

@@ -69,7 +69,7 @@ nextValid = listToMaybe . take 1 . filter valid . drop 1 . iterate next
 
 main = do
    let input = "cqjxjnds"
-       nextp = nextValid $ fromStrRep input
-       nextnextp = nextp >>= nextValid
-   print nextp
-   print nextnextp
+       Just part1 = nextValid $ fromStrRep input
+       Just part2 = nextValid $ part1
+   putStrLn $ strRep part1
+   putStrLn $ strRep part2

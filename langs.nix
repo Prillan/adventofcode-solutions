@@ -1,10 +1,10 @@
 { pkgs ? import ./pkgs.nix }: {
-  hs = rec {
+  hs = {
     name = "Haskell";
     extension = "hs";
     buildInputs = let
       inherit (pkgs) haskellPackages;
-      aoc = haskellPackages.callPackage ./adventofcode/default.nix { };
+      aoc = haskellPackages.callPackage ./adventofcode/pkg.nix { };
       ghcPkgs = hpkgs:
         with hpkgs; [
           MonadRandom

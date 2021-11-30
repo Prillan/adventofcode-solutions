@@ -139,8 +139,8 @@ exec pw (RevMove x y)
 --     ((x, y), (min x y, max x y), start==woopwoop, woop, woopwoop)
 
 
-part1 = foldl' exec (Seq.fromList start)
-part2 = foldl' exec (Seq.fromList stop) . reverse . map rev
+part1 = toList . foldl' exec (Seq.fromList start)
+part2 = toList . foldl' exec (Seq.fromList stop) . reverse . map rev
 
 start = "abcdefgh"
 stop = "fbgdceah"

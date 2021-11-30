@@ -29,5 +29,5 @@ input = "reyedfim"
 
 main = do
   hSetBuffering stdout NoBuffering
-  print part1
-  print part2
+  putStrLn part1
+  putStrLn part2

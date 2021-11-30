@@ -61,8 +61,8 @@ input = Stats { hp = 103
               , dmg = 9
               , def = 2
               , spent = 0}
-part1 = minimumBy spentCompare . filter (flip duel input) $ choices
-part2 = maximumBy spentCompare . filter (duel input) $ choices
+part1 = spent . minimumBy spentCompare . filter (flip duel input) $ choices
+part2 = spent . maximumBy spentCompare . filter (duel input) $ choices
 
 main = do
      print part1

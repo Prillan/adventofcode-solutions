@@ -43,5 +43,5 @@ part2 = solve 35651584 "01111010110010011"
 
 main = do
   hSetBuffering stdout NoBuffering
-  print part1
-  print part2
+  putStrLn part1
+  putStrLn part2

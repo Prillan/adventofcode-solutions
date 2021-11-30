@@ -1,5 +1,5 @@
 import           Data.Aeson
-import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, groupBy, (\\), sortOn)
+import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, groupBy, (\\))
 import qualified Data.List as L
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -30,11 +30,17 @@ subsequences = concat . foldr addoneall [[[]]]
 
 parseAll = map (read :: String -> Integer) . lines
 
-part1 = sortOn (\(_,_,_,p,_) -> p)
+fourth (_, _, _, x, _) = x
+
+part1 = head
+      . sort
+      . map fourth
       . head
       . groupBy (\(_,_,_,_,a) (_,_,_,_,b) -> a == b)
       . goodSplits
-part2 = sortOn (\(_,_,_,p,_) -> p)
+part2 = head
+      . sort
+      . map fourth
       . head
       . groupBy (\(_,_,_,_,a) (_,_,_,_,b) -> a == b)
       . goodSplits'

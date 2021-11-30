@@ -108,8 +108,8 @@ unsafeRight (Right x) = x
 parseAll = map unsafeRight .
   map (parse instrP "") . lines
 
-part1 = exec . newState
-part2 = exec . newState . ((Cpy (Left 1) 'c'):)
+part1 = (Map.! 'a') . fst . exec . newState
+part2 = (Map.! 'a') . fst . exec . newState . ((Cpy (Left 1) 'c'):)
 
 showState :: State -> String
 showState (st, Z prev c next) =

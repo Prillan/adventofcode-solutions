@@ -28,6 +28,6 @@ tests = [ (1, 10)
 
 main = do
   let input = 33100000
-  mapM_ (\(n, s) -> putStrLn $ show (score n == s) ++ " " ++ show n ++ " " ++ show s) tests
+  -- mapM_ (\(n, s) -> putStrLn $ show (score n == s) ++ " " ++ show n ++ " " ++ show s) tests
   print (part1 input)
   print (part2 input)

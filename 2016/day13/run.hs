@@ -54,7 +54,8 @@ neighboursOf input pos = do
 
 part1Input = 1358
 part1 =
-  bfs (1, 1) (neighboursOf part1Input) (== (31, 39))
+  let Just (ans, _) = bfs (1, 1) (neighboursOf part1Input) (== (31, 39))
+  in ans
 
 -- Hacky solution!
 -- Runs in 5 seconds on my laptop.
