@@ -3,7 +3,7 @@
 set -e
 shopt -s extglob
 
-AOC_YEAR=2020
+AOC_YEAR=2021
 AOC_LANG=hs
 
 usage () {
