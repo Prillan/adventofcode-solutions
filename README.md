@@ -4,14 +4,10 @@ solutions are noted below.
 
 ## Completion
 
-| Year | [Haskell](#Haskell) | [ASM](#ASM) |
-|------|---------------------|-------------|
-| 2015 | ✓                   |             |
-| 2016 | ✓                   |             |
-| 2017 | ✓                   |             |
-| 2018 | ~12 days            |             |
-| 2019 | ~13 days            |             |
-| 2020 | ✓                   | 2/25        |
+|  | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| [ASM](#asm) | 0/25 | 0/25 | 0/25 | 0/25 | 0/25 | 2/25 | 0/25 |
+| [Haskell](#haskell) | 16/25 | 23/25 | 23/25 | 11/25 | 9/25 | ✓ | 1/25 |
 
 ## Running the Code
 
@@ -39,71 +35,62 @@ NASM version 2.14.02 compiled on Jan  1 1980
 
 ## Language Completion
 
-### Haskell
-
-Note: 2015-2019 need some cleanup first.
-
-| Day \ Year | 2015                    | 2016 | 2017 | 2018 | 2019 | 2020                     |
-|------------|-------------------------|------|------|------|------|--------------------------|
-| 1          | [✓](./2015/day1/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day1/run.hs)  |
-| 2          | [✓](./2015/day2/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day2/run.hs)  |
-| 3          | [✓](./2015/day3/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day3/run.hs)  |
-| 4          | [✓](./2015/day4/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day4/run.hs)  |
-| 5          | [✓](./2015/day5/run.hs) | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day5/run.hs)  |
-| 6          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day6/run.hs)  |
-| 7          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day7/run.hs)  |
-| 8          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day8/run.hs)  |
-| 9          | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day9/run.hs)  |
-| 10         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day10/run.hs) |
-| 11         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day11/run.hs) |
-| 12         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day12/run.hs) |
-| 13         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day13/run.hs) |
-| 14         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day14/run.hs) |
-| 15         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day15/run.hs) |
-| 16         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day16/run.hs) |
-| 17         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day17/run.hs) |
-| 18         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day18/run.hs) |
-| 19         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day19/run.hs) |
-| 20         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day20/run.hs) |
-| 21         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day21/run.hs) |
-| 22         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day22/run.hs) |
-| 23         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day23/run.hs) |
-| 24         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day24/run.hs) |
-| 25         | TBA                     | TBA  | TBA  | TBA  | TBA  | [✓](./2020/day25/run.hs) |
-
-
-### ASM
-
-I only do the ones I feel like for asm.
-
-| Day \ Year | 2020                      |
-|------------|---------------------------|
-| 1          | [✓](./2020/day1/run.asm)  |
-| 2          |                           |
-| 3          |                           |
-| 4          |                           |
-| 5          |                           |
-| 6          |                           |
-| 7          |                           |
-| 8          |                           |
-| 9          |                           |
-| 10         |                           |
-| 11         |                           |
-| 12         |                           |
-| 13         |                           |
-| 14         |                           |
-| 15         |                           |
-| 16         |                           |
-| 17         |                           |
-| 18         |                           |
-| 19         |                           |
-| 20         |                           |
-| 21         |                           |
-| 22         |                           |
-| 23         | [✓](./2020/day23/run.asm) |
-| 24         |                           |
-| 25         |                           |
-
+## ASM
+| Day \\ Year | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| 1 |  |  |  |  |  | [✓](./2020/day1/run.asm) |  |
+| 2 |  |  |  |  |  |  |  |
+| 3 |  |  |  |  |  |  |  |
+| 4 |  |  |  |  |  |  |  |
+| 5 |  |  |  |  |  |  |  |
+| 6 |  |  |  |  |  |  |  |
+| 7 |  |  |  |  |  |  |  |
+| 8 |  |  |  |  |  |  |  |
+| 9 |  |  |  |  |  |  |  |
+| 10 |  |  |  |  |  |  |  |
+| 11 |  |  |  |  |  |  |  |
+| 12 |  |  |  |  |  |  |  |
+| 13 |  |  |  |  |  |  |  |
+| 14 |  |  |  |  |  |  |  |
+| 15 |  |  |  |  |  |  |  |
+| 16 |  |  |  |  |  |  |  |
+| 17 |  |  |  |  |  |  |  |
+| 18 |  |  |  |  |  |  |  |
+| 19 |  |  |  |  |  |  |  |
+| 20 |  |  |  |  |  |  |  |
+| 21 |  |  |  |  |  |  |  |
+| 22 |  |  |  |  |  |  |  |
+| 23 |  |  |  |  |  | [✓](./2020/day23/run.asm) |  |
+| 24 |  |  |  |  |  |  |  |
+| 25 |  |  |  |  |  |  |  |
+## Haskell
+| Day \\ Year | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| 1 | [✓](./2015/day1/run.hs) | [✓](./2016/day1/run.hs) | [✓](./2017/day1/run.hs) | [✓](./2018/day1/run.hs) | [✓](./2019/day1/run.hs) | [✓](./2020/day1/run.hs) | [✓](./2021/day1/run.hs) |
+| 2 | [✓](./2015/day2/run.hs) | [✓](./2016/day2/run.hs) | [✓](./2017/day2/run.hs) | [✓](./2018/day2/run.hs) | [✓](./2019/day2/run.hs) | [✓](./2020/day2/run.hs) |  |
+| 3 | [✓](./2015/day3/run.hs) | [✓](./2016/day3/run.hs) | [✓](./2017/day3/run.hs) | [✓](./2018/day3/run.hs) | [✓](./2019/day3/run.hs) | [✓](./2020/day3/run.hs) |  |
+| 4 | [✓](./2015/day4/run.hs) | [✓](./2016/day4/run.hs) | [✓](./2017/day4/run.hs) | [✓](./2018/day4/run.hs) | [✓](./2019/day4/run.hs) | [✓](./2020/day4/run.hs) |  |
+| 5 | [✓](./2015/day5/run.hs) | [✓](./2016/day5/run.hs) | [✓](./2017/day5/run.hs) | [✓](./2018/day5/run.hs) | [✓](./2019/day5/run.hs) | [✓](./2020/day5/run.hs) |  |
+| 6 |  | [✓](./2016/day6/run.hs) | [✓](./2017/day6/run.hs) | [✓](./2018/day6/run.hs) | [✓](./2019/day6/run.hs) | [✓](./2020/day6/run.hs) |  |
+| 7 |  | [✓](./2016/day7/run.hs) | [✓](./2017/day7/run.hs) | [✓](./2018/day7/run.hs) | [✓](./2019/day7/run.hs) | [✓](./2020/day7/run.hs) |  |
+| 8 |  |  | [✓](./2017/day8/run.hs) | [✓](./2018/day8/run.hs) |  | [✓](./2020/day8/run.hs) |  |
+| 9 |  | [✓](./2016/day9/run.hs) | [✓](./2017/day9/run.hs) | [✓](./2018/day9/run.hs) | [✓](./2019/day9/run.hs) | [✓](./2020/day9/run.hs) |  |
+| 10 | [✓](./2015/day10/run.hs) | [✓](./2016/day10/run.hs) | [✓](./2017/day10/run.hs) |  | [✓](./2019/day10/run.hs) | [✓](./2020/day10/run.hs) |  |
+| 11 | [✓](./2015/day11/run.hs) | [✓](./2016/day11/run.hs) | [✓](./2017/day11/run.hs) | [✓](./2018/day11/run.hs) |  | [✓](./2020/day11/run.hs) |  |
+| 12 |  | [✓](./2016/day12/run.hs) | [✓](./2017/day12/run.hs) | [✓](./2018/day12/run.hs) |  | [✓](./2020/day12/run.hs) |  |
+| 13 |  | [✓](./2016/day13/run.hs) | [✓](./2017/day13/run.hs) |  |  | [✓](./2020/day13/run.hs) |  |
+| 14 |  | [✓](./2016/day14/run.hs) | [✓](./2017/day14/run.hs) |  |  | [✓](./2020/day14/run.hs) |  |
+| 15 | [✓](./2015/day15/run.hs) | [✓](./2016/day15/run.hs) | [✓](./2017/day15/run.hs) |  |  | [✓](./2020/day15/run.hs) |  |
+| 16 | [✓](./2015/day16/run.hs) | [✓](./2016/day16/run.hs) | [✓](./2017/day16/run.hs) |  |  | [✓](./2020/day16/run.hs) |  |
+| 17 | [✓](./2015/day17/run.hs) |  | [✓](./2017/day17/run.hs) |  |  | [✓](./2020/day17/run.hs) |  |
+| 18 | [✓](./2015/day18/run.hs) | [✓](./2016/day18/run.hs) |  |  |  | [✓](./2020/day18/run.hs) |  |
+| 19 |  | [✓](./2016/day19/run.hs) | [✓](./2017/day19/run.hs) |  |  | [✓](./2020/day19/run.hs) |  |
+| 20 | [✓](./2015/day20/run.hs) | [✓](./2016/day20/run.hs) | [✓](./2017/day20/run.hs) |  |  | [✓](./2020/day20/run.hs) |  |
+| 21 | [✓](./2015/day21/run.hs) | [✓](./2016/day21/run.hs) | [✓](./2017/day21/run.hs) |  |  | [✓](./2020/day21/run.hs) |  |
+| 22 |  | [✓](./2016/day22/run.hs) | [✓](./2017/day22/run.hs) |  |  | [✓](./2020/day22/run.hs) |  |
+| 23 | [✓](./2015/day23/run.hs) | [✓](./2016/day23/run.hs) |  |  |  | [✓](./2020/day23/run.hs) |  |
+| 24 | [✓](./2015/day24/run.hs) | [✓](./2016/day24/run.hs) | [✓](./2017/day24/run.hs) |  |  | [✓](./2020/day24/run.hs) |  |
+| 25 | [✓](./2015/day25/run.hs) | [✓](./2016/day25/run.hs) | [✓](./2017/day25/run.hs) |  |  | [✓](./2020/day25/run.hs) |  |
 
 ## Notes
 
@@ -115,3 +102,7 @@ I only do the ones I feel like for asm.
 - I'm not sure what version of GHC (+ libraries) I used for earlier
   years. I'll try to clean that up.
 - This README is also a WIP...
+
+## TODO
+
+- Use a single cabal project?
