@@ -44,3 +44,7 @@ $$$LANGUAGE_COMPLETION$$$
 - I'm not sure what version of GHC (+ libraries) I used for earlier
   years. I'll try to clean that up.
 - This README is also a WIP...
+
+## TODO
+
+- Use a single cabal project?

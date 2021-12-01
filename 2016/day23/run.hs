@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -91,13 +92,13 @@ jnz s v steps
   | v /= 0 && steps <  0 = backward s (negate steps)
 
 cpy :: State -> Val -> Reg -> State
-cpy (m, z) v k  = (Map.insert k v m, z)
+cpy (!m, z) v k  = (Map.insert k v m, z)
 
 inc :: State -> Reg -> State
-inc (m, z) k = (Map.update (pure . (+1)) k m, z)
+inc (!m, z) k = (Map.update (pure . (+1)) k m, z)
 
 dec :: State -> Reg -> State
-dec (m, z) k = (Map.update (pure . (+ (-1))) k m, z)
+dec (!m, z) k = (Map.update (pure . (+ (-1))) k m, z)
 
 tgl :: State -> Val -> State
 tgl s v
@@ -121,14 +122,14 @@ tgl' (Tgl v) = Inc v
 
 exec1 :: State -> State
 exec1 s =
-  let s' = case current (snd s) of
-             Jnz v steps -> jnz s (val s v) ((val s steps)-1)
-             Cpy v (Right r) -> cpy s (val s v) r
-             Inc (Right r) -> inc s r
-             Dec (Right r) -> dec s r
-             Tgl v -> tgl s (val s v)
-             Stop -> backward s 1
-             _ -> s
+  let !s' = case current (snd s) of
+              Jnz v steps -> jnz s (val s v) ((val s steps)-1)
+              Cpy v (Right r) -> cpy s (val s v) r
+              Inc (Right r) -> inc s r
+              Dec (Right r) -> dec s r
+              Tgl v -> tgl s (val s v)
+              Stop -> backward s 1
+              _ -> s
   in
     forward s' 1
 
@@ -140,12 +141,13 @@ unsafeRight (Right x) = x
 parseAll = map unsafeRight .
   map (parse instrP "") . lines
 
-part1 input =
+run input x =
   let (m, z) = newState input
-  in fst $ exec (Map.insert 'a' 7 m, z)
-part2 input =
-  let (m, z) = newState input
-  in fst $ exec (Map.insert 'a' 12 m, z)
+      (regs, _) = exec (Map.insert 'a' x m, z)
+  in regs Map.! 'a'
+
+part1 input = run input 7
+part2 input = run input 12
 
 main = do
    input <- parseAll <$> readFile "input.txt"

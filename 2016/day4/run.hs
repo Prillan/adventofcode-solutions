@@ -44,4 +44,4 @@ part2 = map (sector . snd) . filter (isInfixOf "north" . fst) . map (decrypt &&&
 main = do
    input <- parseAll <$> readFile "input.txt"
    print (part1 input)
-   print (part2 input)
+   print (head $ part2 input)

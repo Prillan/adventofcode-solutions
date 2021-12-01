@@ -147,5 +147,5 @@ stop = "fbgdceah"
 
 main = do
    input <- parseAll <$> readFile "input.txt"
-   print (part1 input)
-   print (part2 input)
+   putStrLn (part1 input)
+   putStrLn (part2 input)

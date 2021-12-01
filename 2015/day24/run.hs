@@ -1,5 +1,5 @@
 import           Data.Aeson
-import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, groupBy, (\\))
+import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, groupBy, (\\), sort)
 import qualified Data.List as L
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -49,5 +49,5 @@ test = [1..5] ++ [7..11] :: [Integer]
 
 main = do
    input <- parseAll <$> readFile "input.txt"
-   print (head $ part1 input)
-   print (head $ part2 input)
+   print (part1 input)
+   print (part2 input)
