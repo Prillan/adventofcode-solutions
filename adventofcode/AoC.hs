@@ -1,10 +1,15 @@
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
 module AoC ( tce
            , fixpoint
            , V2(V2)
            , V3(V3)
            , v2
            , v3
+           , dropX
+           , dropY
+           , dropZ
            , extendX
            , extendY
            , extendZ
@@ -38,7 +43,7 @@ fixpoint f a =
 
 
 newtype V2 a = V2 (a, a)
-  deriving (Eq, Ord, Show, Functor)
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 v2 = V2
 
@@ -55,6 +60,10 @@ instance Num a => Num (V2 a) where
   signum = fmap signum
   fromInteger = pure . fromInteger
 
+dropX (V3 (_, y, z)) = v2 (y, z)
+dropY (V3 (x, _, z)) = v2 (x, z)
+dropZ (V3 (x, y, _)) = v2 (x, y)
+
 extendX = extendX' 0
 extendY = extendY' 0
 extendZ = extendZ' 0
@@ -64,7 +73,7 @@ extendY' y (V2 (x, z)) = V3 (x, y, z)
 extendZ' z (V2 (x, y)) = V3 (x, y, z)
 
 newtype V3 a = V3 (a, a, a)
-  deriving (Eq, Ord, Show, Functor)
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 v3 = V3
 
