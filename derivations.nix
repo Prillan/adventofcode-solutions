@@ -5,13 +5,24 @@ let
   const = a: b: a;
   langs = import ./langs.nix { inherit pkgs; };
   drv = y: d: lang:
-    with lang;
+    let
+      inherit (lang) name extension buildInputs buildPhase;
+      challengeMeta = {
+        year = builtins.fromJSON y;
+        day = d;
+        lang = {
+          inherit name extension;
+        };
+      };
+    in
     pkgs.stdenv.mkDerivation {
       name = "aoc-${name}-${toString y}-day${toString d}";
       src = builtins.filterSource (path: type:
         (matches ".*.${extension}" path) || (matches ".*.txt" path))
         (dayPath y d);
-      inherit buildInputs;
+      buildInputs = buildInputs ++ [ pkgs.jq ];
+      challengeMeta = builtins.toJSON challengeMeta;
+      passAsFile = [ "challengeMeta" ];
       buildPhase = if builtins.pathExists (dayLangSkipPath y d lang) then
         "touch skip"
       else
@@ -22,7 +33,9 @@ let
           mkdir -p $out/bin
           cp run $out/bin
         fi
-        cp status $out
+        jq ".status = \"$(cat status)\"" \
+          < $challengeMetaPath \
+          > $out/meta.json
       '';
       doCheck = true;
       checkPhase = ''
@@ -40,7 +53,7 @@ let
             cat result.txt
             echo Expected
             cat expected.txt
-            exit 1
+            echo 'B' > status
           fi
         fi
       '';
