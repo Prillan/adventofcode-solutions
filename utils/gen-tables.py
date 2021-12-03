@@ -77,7 +77,7 @@ def lang_table(l):
         if status == 'G':
             return f'[✓](./{y}/day{d}/run.{l})'
         elif status == '?':
-            return '?'
+            return ''
         elif status == 'B':
             return '❌'
         
