@@ -12,11 +12,12 @@ days_by_lang = defaultdict(
     lambda: defaultdict(dict)
 )
 
-langs = {}
+with Path(sys.argv[1]).open() as f:
+    langs = json.load(f)
 
-template = Path(sys.argv[1]).read_text()
+template = Path(sys.argv[2]).read_text()
 
-for drv in map(Path, sys.argv[2:]):
+for drv in map(Path, sys.argv[3:]):
     with (drv / 'meta.json').open() as f:
         meta = json.load(f)
 
@@ -26,7 +27,6 @@ for drv in map(Path, sys.argv[2:]):
         
     days[y][d][l] = meta['status']
     days_by_lang[l][y][d] = meta['status']
-    langs[l] = meta['lang']
 
 years = sorted(days.keys())
 
@@ -57,6 +57,8 @@ def completion_table():
         )
         if completed == 25:
             return '✓'
+        elif completed == 0:
+            return ''
         else:
             return f'{completed}/25'
 
@@ -69,6 +71,20 @@ def completion_table():
     )
 
 def lang_table(l):
+    if langs[l]['full']:
+        return lang_table_full(l)
+    else:
+        return lang_table_simple(l)
+
+def lang_table_simple(l):
+    return '\n'.join(['Solved:'] + [
+        f" - [{y}, day {d}](./{y}/day{d}/run.{l})"
+        for y in years
+        for d in range(1, 26)
+        if days[y][d].get(l, '?') == 'G'
+    ])
+
+def lang_table_full(l):
     def row(d):
         return [d] + [cell(d, y) for y in years]
 
@@ -88,7 +104,7 @@ def lang_table(l):
 
 def lang_tables():
     return '\n'.join(
-        f"## {langs[l]['name']}\n{lang_table(l)}"
+        f"## {langs[l]['name']}\n{lang_table(l)}\n"
         for l in sorted(langs.keys())
     )
 
