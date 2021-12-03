@@ -22,11 +22,18 @@ module AoC ( tce
            , boolsFromBits
            , Counter
            , counter
+           , mostCommon
+           , leastCommon
+           , readBinary
            , module AoC.Grid ) where
 
 
 import Control.Applicative (liftA2)
 import Data.Bits (Bits, setBit, testBit)
+import Data.Char (digitToInt)
+import Data.Foldable (toList)
+import Data.List (maximumBy, minimumBy)
+import Data.Ord (comparing)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
@@ -109,6 +116,9 @@ gcdExt a b =
   in (t, s - q * t, g)
 
 
+readBinary :: (Num a, Bits a) => String -> a
+readBinary = bitsFromBools . map (== '1')
+
 bitsFromBools :: (Num b, Bits b) => [Bool] -> b
 bitsFromBools = foldl f 0 . zip [0..] . reverse
   where f acc (i, True) = setBit acc i
@@ -116,8 +126,13 @@ bitsFromBools = foldl f 0 . zip [0..] . reverse
 
 boolsFromBits n b = reverse $ map (testBit b) [0..n-1]
 
-
 type Counter a = Map a Int
 
-counter :: Ord a => [a] -> Counter a
-counter = Map.fromListWith (+) . flip zip (repeat 1)
+counter :: (Ord a, Foldable t) => t a -> Counter a
+counter = Map.fromListWith (+) . flip zip (repeat 1) . toList
+
+mostCommon :: (Ord a, Foldable t) => t a -> a
+mostCommon = fst . maximumBy (comparing snd) . Map.toList . counter
+
+leastCommon :: (Ord a, Foldable t) => t a -> a
+leastCommon = fst . minimumBy (comparing snd) . Map.toList . counter
