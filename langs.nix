@@ -40,10 +40,14 @@
     extension = "nix";
     runner = pkgs.writeScript "run" ''
       #!${pkgs.bash}/bin/bash
+      TMP=$(${pkgs.coreutils}/bin/mktemp -d)
       ${pkgs.nixUnstable}/bin/nix eval \
           --extra-experimental-features nix-command \
+          --eval-store $TMP \
+          --option store $TMP \
           -f @run@ \
           --raw
+      rm -rf $TMP
     '';
     buildInputs = [ ];
     buildPhase = ''
