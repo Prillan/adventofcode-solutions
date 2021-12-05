@@ -1,15 +1,17 @@
-import Data.Maybe
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TupleSections #-}
+import AoC
+
 import Text.Parsec
 
-import Data.List (foldl')
-import Data.Vector (Vector)
-import qualified Data.Vector as V
+import Data.Functor (($>))
+import Data.Foldable
+import qualified Data.Vector.Unboxed.Mutable as M
+import qualified Data.Vector.Unboxed as V
 
-data Position = P { x :: Int, y :: Int}
-  deriving (Eq, Show)
-
-instance Ord Position where
-  compare p1 p2 = compare (x p1, y p1) (x p2, y p2)
+type Position = V2 Int
 
 data Command = Turn LightState | Toggle
   deriving Show
@@ -19,23 +21,13 @@ data Instruction = I Position Position Command
 data LightState = On | Off
   deriving (Eq, Show)
 
-toggle :: LightState -> LightState
-toggle On = Off
-toggle Off = On
-
-inRange :: Position -> Instruction -> Bool
-inRange (P px py) (I start stop _) = x start <= px && px <= x stop
-                                  && y start <= py && py <= y stop
-
 number = read <$> many1 digit
 
-position = P <$> number <*> (char ',' *> number)
-command = do
-  cmd <- try (string "turn on") <|> try (string "turn off") <|> string "toggle"
-  case cmd of
-    "turn on" -> pure (Turn On)
-    "turn off" -> pure (Turn Off)
-    "toggle" -> pure Toggle
+position = v2 <$> ((,) <$> number <*> (char ',' *> number))
+command = try (string "turn on" $> Turn On)
+  <|> try (string "turn off" $> Turn Off)
+  <|> string "toggle" $> Toggle
+
 instruction = do
   cmd <- command
   _ <- char ' '
@@ -44,34 +36,46 @@ instruction = do
   end <- position
   pure $ I start end cmd
 
-toMaybe (Left _) = Nothing
-toMaybe (Right x) = Just x
+toUpdate :: Position -> Position -> [Position]
+toUpdate (V2 (sx, sy)) (V2 (ex, ey)) = sequence $ v2 ([sx..ex], [sy..ey])
 
-readInstruction = toMaybe . parse instruction ""
+cmdValue :: Command -> Int
+cmdValue = \case Turn On -> 1
+                 Turn Off -> -1
+                 Toggle -> 2
 
-flipSwitch :: Int -> LightState -> LightState
-flipSwitch n | even n    = id
-             | otherwise = toggle
+execCmd :: Command -> Int -> Int
+execCmd = \case Turn On  -> const 1
+                Turn Off -> const 0
+                Toggle   -> \case 0 -> 1
+                                  1 -> 0
 
-theseInstructions :: Position -> [Instruction] -> [Instruction]
-theseInstructions p = filter (inRange p)
+parseAll :: String -> [Instruction]
+parseAll =
+  map (\(Right v) -> v)
+  . map (parse instruction "")
+  . lines
 
-finalState :: [Instruction] -> Position -> LightState
-finalState = finalState' 0
-  where finalState' n [] _ = flipSwitch n Off
-        finalState' n (i@(I _ _ (Turn t)):is) p
-          | inRange p i = flipSwitch n t
-          | otherwise = finalState' n is p
-        finalState' n (i@(I _ _ Toggle):is) p
-          | inRange p i = finalState' (n+1) is p
-          | otherwise = finalState' n is p
+vecIndex :: Position -> Int
+vecIndex (V2 (x, y)) = x + y * 1000
 
-process input = length
-              . filter (==On)
-              . map (finalState instructions)
-              $ [(P x y) | x <- [0..999], y <- [0..999]]
-  where instructions = reverse . mapMaybe readInstruction . lines $ input
+process :: (Command -> Int -> Int) -> [Instruction] -> V.Vector Int
+process f input = V.create do
+  vec <- M.new (1000 * 1000)
+  M.set vec 0
+  forM_ input \(I start end cmd) ->
+    forM_ (toUpdate start end) \p ->
+      M.unsafeModify vec (f cmd) (vecIndex p)
+  pure vec
 
+part1 :: [Instruction] -> Int
+part1 = V.sum . process execCmd
+
+part2 :: [Instruction] -> Int
+part2 = V.sum . process (\cmd v -> max (v + cmdValue cmd) 0)
+
+main :: IO ()
 main = do
-   input <- readFile "input.txt"
-   print (process input)
+  input <- parseAll <$> readFile "input.txt"
+  print (part1 input)
+  print (part2 input)
