@@ -18,15 +18,14 @@ import qualified Data.Set as Set
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
 
-parse = read @Int
-
-parseAll = map parse  . lines
+parseAll = map (read @Int)  . lines
 
 part1 input = length
-              . filter (\(o, n) -> n > o)
-              $ zip input (drop 1 input)
-part2 input =
-  part1 [x + y + z | (x:y:z:_) <- tails input]
+              . filter id
+              $ zipWith (<) input (drop 1 input)
+part2 input = length
+              . filter id
+              $ zipWith (<) input (drop 4 input)
 
 main = main' "input.txt"
 exampleMain = main' "example.txt"
