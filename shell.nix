@@ -9,7 +9,7 @@ in { lang ? "hs", nixpkgs ? import ./pkgs.nix, extraDeps ? defaultExtraDeps }:
     hs = let
       haskellPackages = nixpkgs.haskellPackages.override {
         overrides = self: super: {
-          aoc = super.callPackage ./adventofcode/pkg.nix { };
+          aoc = super.callPackage ./lib/hs/adventofcode/pkg.nix { };
         };
       };
       pkgs = hpkgs: [
@@ -21,5 +21,6 @@ in { lang ? "hs", nixpkgs ? import ./pkgs.nix, extraDeps ? defaultExtraDeps }:
       ] ++ (extraDeps.hs hpkgs);
     in [ (haskellPackages.ghcWithPackages pkgs) ];
     asm = with nixpkgs; [ nasm manpages gdb glibc.dev ];
+    nix = [ (nixpkgs.callPackage ./lib/nix/pkg.nix {}) ];
   };
 in nixpkgs.mkShell { buildInputs = envs."${lang}"; }

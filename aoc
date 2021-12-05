@@ -10,7 +10,7 @@ usage () {
     echo 'usage: ./aoc [-l LANG]  <DAY> [YEAR]' >&2
     echo '           | test-all [YEAR]' >&2
     echo ' -l LANG -- language to use, default hs' >&2
-    echo '            choices: hs, asm' >&2
+    echo '            choices: hs, asm, nix' >&2
     exit 1
 }
 
@@ -30,6 +30,7 @@ day () {
     case $AOC_LANG in
         asm) echo "  nasm -felf64 run.asm && ld -o run run.o && time ./run < input.txt" ;;
         hs) echo "  ghc -O2 run.hs && time ./run" ;;
+        nix) echo "  time nix-eval ./run.nix" ;;
         *) usage ;;
     esac
 

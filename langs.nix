@@ -5,7 +5,7 @@
     extension = "hs";
     buildInputs = let
       inherit (pkgs) haskellPackages;
-      aoc = haskellPackages.callPackage ./adventofcode/pkg.nix { };
+      aoc = haskellPackages.callPackage ./lib/hs/adventofcode/pkg.nix { };
       ghcPkgs = hpkgs:
         with hpkgs; [
           MonadRandom
@@ -38,26 +38,15 @@
     name = "Nix";
     full = false;
     extension = "nix";
-    runner = pkgs.writeScript "run" ''
-      #!${pkgs.bash}/bin/bash
-      TMP=$(${pkgs.coreutils}/bin/mktemp -d)
-      ${pkgs.nixUnstable}/bin/nix eval \
-          --extra-experimental-features nix-command \
-          --eval-store $TMP \
-          --option store $TMP \
-          -f @run@ \
-          --raw
-      rm -rf $TMP
-    '';
-    buildInputs = [ ];
-    buildPhase = ''
-      mkdir -p $out/share/
-      cp $src/{run.nix,input.txt} $out/share/
+    buildInputs = [ pkgs.makeWrapper ];
+    buildPhase =
+      let runner = pkgs.callPackage ./lib/nix/pkg.nix {};
+      in ''
+        mkdir -p $out/share/
+        cp $src/{run.nix,input.txt} $out/share/
 
-      substitute ${runner} run \
-        --subst-var-by run $out/share/run.nix
-      chmod +x run
-      cat run
-    '';
+        makeWrapper ${runner}/bin/nix-eval run \
+          --set TARGET $out/share/run.nix
+      '';
   };
 }
