@@ -16,7 +16,7 @@ let
       };
     in
     pkgs.stdenv.mkDerivation {
-      name = "aoc-${name}-${toString y}-day${toString d}";
+      name = "aoc-${name}-year${toString y}-day${toString d}";
       src = builtins.filterSource (path: type:
         (matches ".*.${extension}" path) || (matches ".*.txt" path))
         (dayPath y d);

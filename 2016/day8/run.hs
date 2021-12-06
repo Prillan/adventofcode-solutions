@@ -1,4 +1,9 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TupleSections #-}
+import AoC
+import AoC.Draw.Chars
+import AoC.Grid
+
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -11,15 +16,11 @@ width = 50
 height :: Int
 height = 6
 
-type Screen = Map (Int, Int) Bool
+type Screen = MapGrid Bool
 
 printScreen :: Screen -> String
-printScreen scr =
-  unlines
-  . map (map (\(x, y) -> printChar (Map.lookup (x, y) scr)))
-  . map (\y -> (,y) <$> [0..width-1]) $  [0..height-1]
-  where printChar (Just True) = 'X'
-        printChar _           = ' '
+printScreen = ppMapGrid (\case True -> 'X'
+                               _    -> ' ')
 
 data Inst = Rect Int Int
           | RotRow Int Int
@@ -60,11 +61,11 @@ update (RotCol x step) prev = foldr f prev (zip (map ((`mod` height) . (+step)) 
 exec :: [Inst] -> Screen
 exec = foldl (flip update) Map.empty
 
-part1 :: [Inst] -> Integer
-part1 = Map.foldl (\a v -> if v then a+1 else a) 0 . exec
+part1 :: [Inst] -> Int
+part1 = Map.foldl (\a v -> a + fromEnum v) 0 . exec
 
 part2 :: [Inst] -> String
-part2 = printScreen . exec
+part2 = unsafeRight . readLetters . printScreen . exec
 
 main = do
    input <- parseAll <$> readFile "input.txt"

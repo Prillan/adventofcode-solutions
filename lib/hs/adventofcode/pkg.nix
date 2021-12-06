@@ -1,9 +1,9 @@
-{ mkDerivation, base, containers, stdenv }:
+{ mkDerivation, base, containers, lib, split }:
 mkDerivation {
   pname = "adventofcode";
   version = "0.1.0.0";
   src = ./.;
-  libraryHaskellDepends = [ base containers ];
+  libraryHaskellDepends = [ base containers split ];
   license = "unknown";
-  hydraPlatforms = stdenv.lib.platforms.none;
+  hydraPlatforms = lib.platforms.none;
 }

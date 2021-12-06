@@ -1,4 +1,4 @@
-{ nixpkgs ? import <nixpkgs> {} }:
+{ nixpkgs ? import ../../../pkgs.nix }:
 nixpkgs.mkShell {
   buildInputs = [
     nixpkgs.cabal2nix
