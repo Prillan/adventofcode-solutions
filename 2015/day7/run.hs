@@ -2,6 +2,7 @@
 
 import Debug.Trace (trace)
 
+import Control.Monad (join)
 import Data.Bits
 import Data.Functor.Identity (Identity)
 import Data.Foldable (foldl')
@@ -80,13 +81,21 @@ step (xs, m) = foldl' f ([], m) xs
 
 getFinalState is = iterate step (is, initial)
 
-process input = Map.lookup (Register "a") final
+parseAll = mapEither readInstruction . lines
+
+part1 is = final Map.! Register "a"
   where final = snd
               . head
               . dropWhile (not . null . fst)
-              . getFinalState
-              . mapEither readInstruction . lines $ input
+              . getFinalState $ is
+
+part2 lastA is = part1 newIs
+  where setB (I (SET _) (Register "b")) = True
+        setB _ = False
+        newIs = (I (SET (Number lastA)) (Register "b")):(filter (not . setB) is)
 
 main = do
-   input <- readFile "input.txt"
-   print (process input)
+   input <- parseAll <$> readFile "input.txt"
+   let p1 = part1 input
+   print p1
+   print (part2 p1 input)
