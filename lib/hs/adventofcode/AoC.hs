@@ -1,8 +1,11 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
 module AoC ( tce
            , fixpoint
+
+           -- vectors
            , V2(V2)
            , V3(V3)
            , v2
@@ -16,15 +19,25 @@ module AoC ( tce
            , extendX'
            , extendY'
            , extendZ'
+
+           -- number theory
            , gcdExt
            , modInv
+
+           -- statistics
+           , mean
+           , median
+
+           -- binary
            , bitsFromBools
            , boolsFromBits
+           , readBinary
+
+           -- counting
            , Counter
            , counter
            , mostCommon
            , leastCommon
-           , readBinary
            , module AoC.Grid ) where
 
 
@@ -32,7 +45,7 @@ import Control.Applicative (liftA2)
 import Data.Bits (Bits, setBit, testBit)
 import Data.Char (digitToInt)
 import Data.Foldable (toList)
-import Data.List (maximumBy, minimumBy)
+import Data.List (maximumBy, minimumBy, sort)
 import Data.Ord (comparing)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -97,6 +110,19 @@ instance Num a => Num (V3 a) where
   signum = fmap signum
   fromInteger = pure . fromInteger
 
+median :: (Foldable t, Ord a, Fractional a) => t a -> a
+median xs =
+  case (length xs `divMod` 2, sort (toList xs)) of
+    (_, []) -> error "median of empty list"
+    ((n, 0), s) -> s !! n
+    ((n, _), s) -> sum (take 2 . drop n $ s) / 2
+
+mean :: (Foldable t, Eq a, Fractional a) => t a -> a
+mean xs =
+  case foldr f (0, 0) xs of
+    (_, 0) -> error "mean of empty list"
+    (l, s) -> s / l
+  where f x (!l, !s) = (l + 1, s + x)
 
 modInv :: Int -> Int -> Maybe Int
 modInv a m
