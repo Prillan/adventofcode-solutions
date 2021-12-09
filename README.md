@@ -7,7 +7,7 @@ solutions are noted below.
 |  | 2015 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 |
 |------|------|------|------|------|------|------|------|
 | [ASM](#asm) |  |  |  |  |  | 2/25 |  |
-| [Haskell](#haskell) | 18/25 | 24/25 | 23/25 | 11/25 | 9/25 | ✓ | 8/25 |
+| [Haskell](#haskell) | 18/25 | 24/25 | 23/25 | 11/25 | 9/25 | ✓ | 9/25 |
 | [Nix](#nix) |  |  |  |  |  |  | 1/25 |
 
 ## Running the Code
@@ -52,7 +52,7 @@ Solved:
 | 6 | [✓](./2015/day6/run.hs) | [✓](./2016/day6/run.hs) | [✓](./2017/day6/run.hs) | [✓](./2018/day6/run.hs) | [✓](./2019/day6/run.hs) | [✓](./2020/day6/run.hs) | [✓](./2021/day6/run.hs) |
 | 7 | [✓](./2015/day7/run.hs) | [✓](./2016/day7/run.hs) | [✓](./2017/day7/run.hs) | [✓](./2018/day7/run.hs) | [✓](./2019/day7/run.hs) | [✓](./2020/day7/run.hs) | [✓](./2021/day7/run.hs) |
 | 8 |  | [✓](./2016/day8/run.hs) | [✓](./2017/day8/run.hs) | [✓](./2018/day8/run.hs) |  | [✓](./2020/day8/run.hs) | [✓](./2021/day8/run.hs) |
-| 9 |  | [✓](./2016/day9/run.hs) | [✓](./2017/day9/run.hs) | [✓](./2018/day9/run.hs) | [✓](./2019/day9/run.hs) | [✓](./2020/day9/run.hs) |  |
+| 9 |  | [✓](./2016/day9/run.hs) | [✓](./2017/day9/run.hs) | [✓](./2018/day9/run.hs) | [✓](./2019/day9/run.hs) | [✓](./2020/day9/run.hs) | [✓](./2021/day9/run.hs) |
 | 10 | [✓](./2015/day10/run.hs) | [✓](./2016/day10/run.hs) | [✓](./2017/day10/run.hs) |  | [✓](./2019/day10/run.hs) | [✓](./2020/day10/run.hs) |  |
 | 11 | [✓](./2015/day11/run.hs) | [✓](./2016/day11/run.hs) | [✓](./2017/day11/run.hs) | [✓](./2018/day11/run.hs) |  | [✓](./2020/day11/run.hs) |  |
 | 12 |  | [✓](./2016/day12/run.hs) | [✓](./2017/day12/run.hs) | [✓](./2018/day12/run.hs) |  | [✓](./2020/day12/run.hs) |  |
