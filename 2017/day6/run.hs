@@ -5,8 +5,8 @@ import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 
 parse :: String -> Seq Int
@@ -36,20 +36,20 @@ part1 input =
             (i + 1, memory', Set.insert (toList memory) s)
 
 part2 input =
-  let (i, mem, seen) = until alreadySeen step (0, input, Map.empty)
+  let (i, mem, seen) = until alreadySeen step (0, input, HashMap.empty)
   in
-    case Map.lookup (toList mem) seen of
+    case HashMap.lookup (toList mem) seen of
       Just first -> i - first
       Nothing    -> -1 -- whoops
-  where alreadySeen (_, memory, s) = toList memory `Map.member` s
+  where alreadySeen (_, memory, s) = toList memory `HashMap.member` s
         size = Seq.length input
-        step :: (Int, Seq Int, Map [Int] Int) -> (Int, Seq Int, Map [Int] Int)
+        step :: (Int, Seq Int, HashMap [Int] Int) -> (Int, Seq Int, HashMap [Int] Int)
         step (i, memory, s) =
           let (mi, max) = maximumBy (comparing $ \(i, v) -> (v, -i))
                 . zip [0..] . toList $ memory
               memory' = redistribute size mi max memory
           in
-            (i + 1, memory', Map.insert (toList memory) i s)
+            (i + 1, memory', HashMap.insert (toList memory) i s)
 main = do
   input <- parse <$> readFile "input.txt"
   print $ part1 input

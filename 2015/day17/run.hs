@@ -7,8 +7,8 @@ import           Data.List ( permutations
                            , maximumBy
                            , sort
                            , subsequences )
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import           Text.Parsec
 
 unsafeRight (Right x) = x

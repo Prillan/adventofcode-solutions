@@ -8,10 +8,10 @@ import Control.Monad.Identity (Identity(..))
 import Control.Monad.State (StateT(..), gets, modify, lift, get, MonadState, MonadTrans, State, runState)
 import Data.Char (isDigit)
 import Data.Maybe (maybe)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
-type Program = Map Integer Integer
+type Program = HashMap Integer Integer
 type ExecInfo = (Integer, Program)
 
 class Monad m => Interpreter m where
@@ -45,7 +45,7 @@ data Param = Position Address | Immediate Integer
   deriving Show
 
 rawValAt :: MonadState ExecInfo m => Address -> m Integer
-rawValAt addr = maybe 0 id . Map.lookup addr <$> gets memory
+rawValAt addr = maybe 0 id . HashMap.lookup addr <$> gets memory
 
 pc :: ExecInfo -> Integer
 pc = fst
@@ -60,10 +60,10 @@ paramValue (Immediate x) = pure x
 paramValue (Position x) = rawValAt x
 
 writeMemory addr val =
-  modify (\(pc, prog) -> (pc, Map.insert addr val prog))
+  modify (\(pc, prog) -> (pc, HashMap.insert addr val prog))
 
 parseAll :: String -> Program
-parseAll input = Map.fromList $ zip [0..] . read $ '[' : input ++ "]"
+parseAll input = HashMap.fromList $ zip [0..] . read $ '[' : input ++ "]"
 
 consumeInstruction :: Interpreter m => ProgT m Instruction
 consumeInstruction = do

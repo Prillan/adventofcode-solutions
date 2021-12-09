@@ -11,6 +11,8 @@ import Data.Bifunctor
 import Data.Maybe
 import Data.List
 import Data.List.Split (chunksOf, splitOn)
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Sequence (Seq)
@@ -58,28 +60,28 @@ bottomBorder = last
 topBorder :: Tile -> String
 topBorder = head
 
-corners :: Map Int Tile -> [Int]
+corners :: HashMap Int Tile -> [Int]
 corners tiles =
   let unmatched = unmatchedBorders tiles
       bts =
-        Map.filter ((== 4) . length . filter (`elem` unmatched))
+        HashMap.filter ((== 4) . length . filter (`elem` unmatched))
         $ borderMap tiles
-  in Map.keys $ bts
+  in HashMap.keys $ bts
 
-borderMap = Map.map borders
+borderMap = HashMap.map borders
 
 unmatchedBorders =
   Map.keys
   . Map.filter (== 1)
   . counter
   . concat
-  . Map.elems
+  . HashMap.elems
   . borderMap
 
-assemble :: Map Int Tile -> [[Tile]]
+assemble :: HashMap Int Tile -> [[Tile]]
 assemble tiles =
   let unmatched = unmatchedBorders tiles
-      tl = tiles Map.! tlid
+      tl = tiles HashMap.! tlid
       tlid = head $ corners tiles
       isTopLeft x =
         all (`elem` unmatched)
@@ -93,8 +95,8 @@ assemble tiles =
         let rbd = bd0 tile
         in find (\(_, t) -> bd1 t == rbd)
            . concatMap (\(i, t) -> (i,) <$> symmetries t)
-           . Map.toList
-           $ Map.delete tid tiles
+           . HashMap.toList
+           $ HashMap.delete tid tiles
 
       findNextInRow = findNext rightBorder leftBorder
       findNextInCol = findNext bottomBorder topBorder
@@ -155,15 +157,15 @@ zip2dWith :: (a -> b -> c) -> [[a]] -> [[b]] -> [[c]]
 zip2dWith op = zipWith (zipWith op)
 
 parseAll =
-  Map.fromList
+  HashMap.fromList
   . map parseTile
   . filter (not . null)
   . splitOn "\n\n"
 
-part1 :: Map Int Tile -> Int
+part1 :: HashMap Int Tile -> Int
 part1 = product . corners
 
-part2 :: Map Int Tile -> Int
+part2 :: HashMap Int Tile -> Int
 part2 tiles =
   let image = glue (assemble tiles)
       n = numberOfSeaMonsters image

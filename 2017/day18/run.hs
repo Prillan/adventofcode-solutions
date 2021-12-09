@@ -2,8 +2,8 @@ import Data.Foldable
 import Data.Bits (xor)
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence ( Seq(..)
                      , (|>)
                      , viewr
@@ -28,10 +28,10 @@ unsafeRight (Left x) = error $ show x
 type Reg = Char
 data Action = Play Integer | Receive Integer
   deriving Show
-data ProgramState = PState { program       :: Map Int (Program ())
+data ProgramState = PState { program       :: HashMap Int (Program ())
                            , pointer       :: Int
                            , programLength :: Int
-                           , regs          :: Map Reg Integer
+                           , regs          :: HashMap Reg Integer
                            , actionLog     :: [Action] }
 
 instance Show ProgramState where
@@ -55,10 +55,10 @@ receive = do
     _ -> pure $ Nothing
 
 setReg :: Reg -> Integer -> ProgramState -> ProgramState
-setReg r v s = s { regs = Map.insert r v (regs s) }
+setReg r v s = s { regs = HashMap.insert r v (regs s) }
 
-regLookup :: Reg -> Map Reg Integer -> Integer
-regLookup r = maybe 0 id . Map.lookup r
+regLookup :: Reg -> HashMap Reg Integer -> Integer
+regLookup r = maybe 0 id . HashMap.lookup r
 
 reg r = regLookup r . regs
 
@@ -158,7 +158,7 @@ parseAll =
 eval :: Program (Maybe Integer)
 eval = do
   s <- get
-  case Map.lookup (pointer s) (program s) of
+  case HashMap.lookup (pointer s) (program s) of
     Just instr -> do
       instr
       s' <- get
@@ -170,9 +170,9 @@ eval = do
 part1 :: [Program ()] -> Maybe Integer
 part1 instr =
   let initial = PState { pointer = 0
-                       , program = Map.fromList (zip [0..] instr)
+                       , program = HashMap.fromList (zip [0..] instr)
                        , programLength = length instr
-                       , regs = Map.empty
+                       , regs = HashMap.empty
                        , actionLog = [] }
   in
     fst $ runState eval initial

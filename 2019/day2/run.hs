@@ -1,20 +1,20 @@
 module Main (main) where
 
 import Data.Maybe (maybe)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
-type Program = Map Integer Integer
+type Program = HashMap Integer Integer
 type ExecInfo = (Integer, Program)
 
 val :: Integer -> Program -> Integer
-val x prog = maybe 0 id $ Map.lookup x prog
+val x prog = maybe 0 id $ HashMap.lookup x prog
 
 val2 :: Integer -> Program -> Integer
 val2 x prog = val (val x prog) prog
 
 parseAll :: String -> Program
-parseAll input = Map.fromList $ zip [0..] . read $ '[' : input ++ "]"
+parseAll input = HashMap.fromList $ zip [0..] . read $ '[' : input ++ "]"
 
 exec :: Program -> Program
 exec prog = exec' (0, prog)
@@ -31,10 +31,10 @@ binOp :: (Integer -> Integer -> Integer) -> ExecInfo -> ExecInfo
 binOp (¤) (pc, prog) =
   let result = (val2 (pc + 1) prog) ¤ (val2 (pc + 2) prog)
   in
-    (pc + 4, Map.insert (val (pc + 3) prog) result prog)
+    (pc + 4, HashMap.insert (val (pc + 3) prog) result prog)
 
 execWithInput :: Integer -> Integer -> Program -> Program
-execWithInput x y = exec . Map.insert 1 x . Map.insert 2 y
+execWithInput x y = exec . HashMap.insert 1 x . HashMap.insert 2 y
 
 part1 :: Program -> Integer
 part1 = val 0 . execWithInput 12 2

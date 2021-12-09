@@ -3,8 +3,8 @@ module AoC.Draw.Chars (readLetters) where
 import Data.List (transpose)
 import Data.List.Split (chunksOf)
 
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 readLetters :: String -> Either String String
 readLetters =
@@ -24,14 +24,14 @@ letters =
           , ('Y', ly)
           , ('Z', lz)
           ]
-  in ( Map.fromList m
-     , Map.fromList (map (\(x, y) -> (y, x)) m)
+  in ( HashMap.fromList m
+     , HashMap.fromList (map (\(x, y) -> (y, x)) m)
      )
 
 readLetter :: [String] -> Either String Char
 readLetter block =
   let (_, m) = letters
-  in case Map.lookup block m of
+  in case HashMap.lookup block m of
        Just l  -> Right l
        Nothing -> Left $ "No letter mapping found for this block: \n"
                         ++ unlines block

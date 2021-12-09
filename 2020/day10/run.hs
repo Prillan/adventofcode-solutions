@@ -1,8 +1,8 @@
 {-# LANGUAGE TypeApplications #-}
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 count e = length . filter (== e)
 
@@ -10,15 +10,15 @@ parseAll =
   map (read @Integer) . lines
 
 
-l m = maybe 1 id . flip Map.lookup m
+l m = maybe 1 id . flip HashMap.lookup m
 
-arrangements = flip l 0 . go Map.empty [] . reverse . sort . (0:)
+arrangements = flip l 0 . go HashMap.empty [] . reverse . sort . (0:)
   where go m _ [] = m
-        go m [] (x:xs) = go (Map.insert x 1 m) [x] xs
+        go m [] (x:xs) = go (HashMap.insert x 1 m) [x] xs
         go m back (x:xs) =
           let options = takeWhile (<= (x + 3)) back
               v = sum $ map (l m) options
-              m' = Map.insert x v m
+              m' = HashMap.insert x v m
           in go m' (x:back) xs
 
 part1 input =

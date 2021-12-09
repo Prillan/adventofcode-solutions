@@ -1,7 +1,7 @@
 import           Control.Monad.Identity (Identity(..))
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import           Pipes
 import qualified Pipes.Prelude as P
 import           Data.Void (Void)
@@ -76,13 +76,13 @@ fromList def xs =
   let (x':xs') = xs ++ repeat def
   in Z (repeat def) x' xs'
 
-type State = (Map Reg Val, Zipper Instr)
+type State = (HashMap Reg Val, Zipper Instr)
 
-newState instr = (Map.fromList (zip "abcd" (repeat 0)), fromList Stop instr)
+newState instr = (HashMap.fromList (zip "abcd" (repeat 0)), fromList Stop instr)
 
 val :: State -> Either Val Reg -> Val
 val _ (Left v) = v
-val (m, _) (Right r) = maybe 0 id (Map.lookup r m)
+val (m, _) (Right r) = maybe 0 id (HashMap.lookup r m)
 
 iter :: (a -> a) -> Int -> a -> a
 iter f n = foldr (.) id (replicate n f)
@@ -102,13 +102,13 @@ jnz s v steps
   | v /= 0 && steps <  0 = backward s (negate steps)
 
 cpy :: State -> Val -> Reg -> State
-cpy (m, z) v k  = (Map.insert k v m, z)
+cpy (m, z) v k  = (HashMap.insert k v m, z)
 
 inc :: State -> Reg -> State
-inc (m, z) k = (Map.update (pure . (+1)) k m, z)
+inc (m, z) k = (HashMap.update (pure . (+1)) k m, z)
 
 dec :: State -> Reg -> State
-dec (m, z) k = (Map.update (pure . (+ (-1))) k m, z)
+dec (m, z) k = (HashMap.update (pure . (+ (-1))) k m, z)
 
 tgl :: State -> Val -> State
 tgl s v
@@ -164,10 +164,10 @@ verify prod =
 part1 input = fst.head . filter (verify.snd) . map f $ [0..]
   where f i =
           let (m, z) = newState input
-          in (i, exec (Map.insert 'a' i m, z))
+          in (i, exec (HashMap.insert 'a' i m, z))
 -- part2 input =
 --   let (m, z) = newState input
---   in fst $ exec (Map.insert 'a' 12 m, z)
+--   in fst $ exec (HashMap.insert 'a' 12 m, z)
 
 main = do
    input <- parseAll <$> readFile "input.txt"

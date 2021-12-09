@@ -8,12 +8,13 @@ import Control.Applicative (liftA2)
 import Data.Bits (xor)
 import Data.Ord (comparing)
 import Data.Bifunctor
+import Data.Foldable
 import Data.Function ((&))
 import Data.Maybe
 import Data.List
 import Data.List.Split
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
@@ -45,14 +46,16 @@ lspan v@(V2 (fx, fy), V2 (tx, ty))
   | diag v = map v2 $ zip (range fx tx) (range fy ty)
 
 part1 = length
-        . Map.filter (> 1)
+        . filter (> 1)
+        . toList
         . counter
         . concat
         . map lspan
         . filter hv
 
 part2 = length
-        . Map.filter (> 1)
+        . filter (> 1)
+        . toList
         . counter
         . concat
         . map lspan

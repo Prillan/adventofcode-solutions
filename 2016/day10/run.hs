@@ -1,8 +1,8 @@
 {-# LANGUAGE TupleSections #-}
 import           Data.Bifunctor
 import           Data.List (sort)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import           Text.Megaparsec hiding (State, empty)
 import           Text.Megaparsec.Char
 import           Data.Void (Void)
@@ -12,18 +12,18 @@ unsafeRight (Right x) = x
 type BotId = Int
 type OutputId = Int
 data Target = B BotId | O OutputId
-type Logic = (Map BotId [Int], Map OutputId Int)
+type Logic = (HashMap BotId [Int], HashMap OutputId Int)
 
 empty :: Logic
-empty = (Map.empty, Map.empty)
+empty = (HashMap.empty, HashMap.empty)
 
 num = read <$> some digitChar
 
 insertBot :: Int -> BotId -> Logic -> Logic
-insertBot val bid = first (Map.insertWith (++) bid [val])
+insertBot val bid = first (HashMap.insertWith (++) bid [val])
 
 insertOut :: Int -> OutputId -> Logic -> Logic
-insertOut val oid = second (Map.insert oid val)
+insertOut val oid = second (HashMap.insert oid val)
 
 insertTarget :: Int -> Target -> Logic -> Logic
 insertTarget val t =
@@ -35,7 +35,7 @@ insert val bid = Just . insertBot val bid
 
 move :: BotId -> Target -> Target -> Logic -> Maybe Logic
 move bid lowTo highTo logic = do
-  [low, high] <- sort <$> Map.lookup bid (fst logic)
+  [low, high] <- sort <$> HashMap.lookup bid (fst logic)
   pure . insertTarget low lowTo . insertTarget high highTo $ logic
 
 type Inst = Logic -> Maybe Logic
@@ -70,7 +70,7 @@ part1 =
   fst . head
   . filter ((== [17, 61]) . snd)
   . map (second sort)
-  . Map.toList
+  . HashMap.toList
   . fst
   . eval
 part2 :: [Inst] -> Int
@@ -78,7 +78,7 @@ part2 =
   product
   . map snd
   . filter ((`elem` [0,1,2]) . fst)
-  . Map.toList
+  . HashMap.toList
   . snd
   . eval
 

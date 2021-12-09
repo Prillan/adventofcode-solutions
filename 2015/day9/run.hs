@@ -2,8 +2,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 import Data.List (minimumBy, permutations, nub)
 import Data.Maybe
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.String (IsString, fromString)
@@ -42,8 +42,8 @@ shortestPath paths = minimumBy (\a b -> snd a `compare` snd b)
                    . map (\cs -> (cs, sum $ zipWith lookup cs (drop 1 cs)))
                    . permutations $ cities
   where cities = nub $ map start paths ++ map stop paths
-        distances = Map.fromList . map (\p -> ((start p, stop p), dist p)) $ paths
-        lookup s e = fromJust $ Map.lookup (s, e) distances <|> Map.lookup (e, s) distances
+        distances = HashMap.fromList . map (\p -> ((start p, stop p), dist p)) $ paths
+        lookup s e = fromJust $ HashMap.lookup (s, e) distances <|> HashMap.lookup (e, s) distances
 
 remove :: Eq a => a -> [a] -> [a]
 remove x = filter (/= x)

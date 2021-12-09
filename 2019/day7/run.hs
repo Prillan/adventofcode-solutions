@@ -10,13 +10,13 @@ import Control.Monad.State ( StateT(..)
                            , MonadState )
 import Data.Bool (bool)
 import Data.List (permutations)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Maybe (maybe)
 import Pipes
 import qualified Pipes.Prelude as P
 
-type Program = Map Integer Integer
+type Program = HashMap Integer Integer
 type ExecInfo = (Integer, Bool, Program)
 
 type Address = Integer
@@ -35,7 +35,7 @@ data Param = Position Address | Immediate Integer
   deriving Show
 
 rawValAt :: MonadState ExecInfo m => Address -> m Integer
-rawValAt addr = maybe 0 id . Map.lookup addr <$> gets memory
+rawValAt addr = maybe 0 id . HashMap.lookup addr <$> gets memory
 
 pc :: ExecInfo -> Integer
 pc (pc', _, _) = pc'
@@ -52,10 +52,10 @@ paramValue (Position x) = rawValAt x
 
 writeMemory :: MonadState ExecInfo m => Address -> Integer -> m ()
 writeMemory addr val =
-  modify (\(pc', halt, prog) -> (pc', halt, Map.insert addr val prog))
+  modify (\(pc', halt, prog) -> (pc', halt, HashMap.insert addr val prog))
 
 parseAll :: String -> Program
-parseAll input = Map.fromList $ zip [0..] . read $ '[' : input ++ "]"
+parseAll input = HashMap.fromList $ zip [0..] . read $ '[' : input ++ "]"
 
 consumeInstruction :: MonadState ExecInfo m => m Instruction
 consumeInstruction = do

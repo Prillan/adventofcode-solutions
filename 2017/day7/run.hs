@@ -7,8 +7,8 @@ import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 data Disc = Disc String Int [String]
   deriving Show
@@ -45,23 +45,23 @@ part1 input =
       [name] -> name
       x -> error "More than one"
 
-aggWeights :: Map String Disc -> Disc -> Int
+aggWeights :: HashMap String Disc -> Disc -> Int
 aggWeights discs (Disc _ w h) =
   w + (sum . map (aggWeights discs . disc discs) $ h)
 
-balanced :: Map String Disc -> Disc -> Bool
+balanced :: HashMap String Disc -> Disc -> Bool
 balanced discs d =
   (<= 1) $ length $ nub $ map (aggWeights discs . disc discs) $ discHolding d
 
-disc :: Map String Disc -> String -> Disc
+disc :: HashMap String Disc -> String -> Disc
 disc discs dname =
-  case Map.lookup dname discs of
+  case HashMap.lookup dname discs of
     Just d -> d
     Nothing -> error "Uh-oh"
 
 part2 input =
-  let discs = Map.fromList $ map (\d@(Disc n _ _) -> (n, d)) input
-      parents = Map.fromList $ do
+  let discs = HashMap.fromList $ map (\d@(Disc n _ _) -> (n, d)) input
+      parents = HashMap.fromList $ do
         Disc n _ h <- input
         child <- h
         pure (child, n)
@@ -70,7 +70,7 @@ part2 input =
       candidates = candidates' $ map discName leafs
       candidates' [] = []
       candidates' nodes =
-        let ps = nub . mapMaybe (flip Map.lookup parents) $ nodes
+        let ps = nub . mapMaybe (flip HashMap.lookup parents) $ nodes
         in
           nodes ++ candidates' ps
 

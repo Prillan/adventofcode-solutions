@@ -1,8 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Text.Megaparsec
 import Text.Megaparsec.Char
 
@@ -12,11 +12,11 @@ unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
 unsafeRight (Left x) = error $ show x
 
-type Grid = Map (Int, Int)
+type Grid = HashMap (Int, Int)
 
 replace f d m k  =
-  let v = maybe d id (Map.lookup k m)
-  in Map.insert k (f v) m
+  let v = maybe d id (HashMap.lookup k m)
+  in HashMap.insert k (f v) m
 
 data Claim = Claim { cId :: Int
                    , cX  :: Int
@@ -49,8 +49,8 @@ claimArea Claim{..} m =
 part1 :: [Claim] -> Int
 part1 = length
         . filter ((>1) . snd)
-        . Map.toList
-        . foldl (flip claimArea) Map.empty
+        . HashMap.toList
+        . foldl (flip claimArea) HashMap.empty
 
 overlaps :: Claim -> Claim -> Bool
 overlaps c1 c2 =

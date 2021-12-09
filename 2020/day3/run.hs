@@ -1,6 +1,4 @@
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
 
 data Cell = Tree | NoTree
   deriving (Show, Eq)

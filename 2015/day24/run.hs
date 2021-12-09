@@ -1,8 +1,6 @@
 import           Data.Aeson
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, groupBy, (\\), sort)
 import qualified Data.List as L
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
 import           Text.Parsec
 import Debug.Trace
 

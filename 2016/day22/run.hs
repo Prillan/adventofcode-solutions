@@ -4,8 +4,8 @@ import           Data.List ( intercalate
                            , maximum
                            , minimumBy
                            , subsequences)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import           Data.PriorityQueue.FingerTree (PQueue)
 import qualified Data.PriorityQueue.FingerTree as PQueue
 import           Data.Set (Set)
@@ -31,7 +31,7 @@ lineP = (,) <$> nodeNameP <*> nodeP
 
 unsafeRight (Right x) = x
 
-parseAll = Map.fromList . map unsafeRight .
+parseAll = HashMap.fromList . map unsafeRight .
   map (parse lineP "") . drop 2 . lines
 
 viable :: Node -> Node -> Bool
@@ -39,8 +39,8 @@ viable a b =
   used a > 0 && avail b >= used a
 
 part1 nodes = length $ do
-  n1 <- Map.toList nodes
-  n2 <- Map.toList nodes
+  n1 <- HashMap.toList nodes
+  n2 <- HashMap.toList nodes
   guard $ fst n1 /= fst n2
   guard $ viable (snd n1) (snd n2)
   pure $ (n1, n2)
@@ -49,7 +49,7 @@ data Reduced = NEmpty | NGoal | NBig | NNormal
   deriving (Show, Eq, Ord)
 data State = State { goal :: {-# UNPACK #-} !(Int, Int)
                    , empty :: {-# UNPACK #-} !(Int, Int)
-                   , nodes :: Map (Int, Int) Reduced }
+                   , nodes :: HashMap (Int, Int) Reduced }
   deriving (Show, Eq, Ord)
 
 solve :: State -> (Int, State)
@@ -82,23 +82,23 @@ viable' _ = False
 neighboursOf :: State -> [State]
 neighboursOf s = do
   let (x, y) = empty s
-      Just en = Map.lookup (empty s) (nodes s)
+      Just en = HashMap.lookup (empty s) (nodes s)
   (x', y') <- [(x, y-1), (x-1, y), (x, y+1), (x+1, y)]
-  Just bn <- pure $ Map.lookup (x', y') (nodes s)
+  Just bn <- pure $ HashMap.lookup (x', y') (nodes s)
   guard $ viable' bn
   let g' = if (x', y') == goal s
              then (x, y)
              else goal s
       e' = (x', y')
-      m = Map.insert (x', y') en $
-          Map.insert (x, y) bn $ nodes s
+      m = HashMap.insert (x', y') en $
+          HashMap.insert (x, y) bn $ nodes s
   pure $ State { goal = g'
                , empty = e'
                , nodes = m }
 
 part2 = fst . solve . initialState
 
-reduceGrid g = Map.mapWithKey f
+reduceGrid g = HashMap.mapWithKey f
   where f pos n
          | used n == 0   = NEmpty
          | pos == g      = NGoal
@@ -106,10 +106,10 @@ reduceGrid g = Map.mapWithKey f
          | otherwise     = NNormal
 
 initialState grid =
-  let mx = maximum . map (fst . fst) . Map.toList $ grid
+  let mx = maximum . map (fst . fst) . HashMap.toList $ grid
       g = (mx, 0)
       grid' = reduceGrid g grid
-      (epos, _) = head . filter ((==NEmpty).snd) . Map.toList $ grid'
+      (epos, _) = head . filter ((==NEmpty).snd) . HashMap.toList $ grid'
   in
     State { goal = g
           , empty = epos
@@ -121,10 +121,10 @@ pstate s =
         ++ "\nh:     " ++ show (h s)
 
 pgrid s =
-  let xm = maximum . map (fst . fst) . Map.toList $ nodes s
-      ym = maximum . map (snd . fst) . Map.toList $ nodes s
+  let xm = maximum . map (fst . fst) . HashMap.toList $ nodes s
+      ym = maximum . map (snd . fst) . HashMap.toList $ nodes s
       c pos =
-        let Just v = Map.lookup pos (nodes s)
+        let Just v = HashMap.lookup pos (nodes s)
         in case v of
              NEmpty -> '_'
              NNormal -> '.'

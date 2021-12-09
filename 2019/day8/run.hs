@@ -2,10 +2,10 @@ import Control.Applicative ((<|>))
 import Data.Char (isDigit)
 import Data.Ord (comparing)
 import Data.List (minimumBy)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
-type Counter a = Map a Int
+type Counter a = HashMap a Int
 
 data Color = Black | White
   deriving (Show, Eq)
@@ -21,11 +21,11 @@ pretty (Just White) = ' '
 pretty _ = 'X'
 
 counter :: Ord a => [a] -> Counter a
-counter = Map.fromListWith (+) . flip zip (repeat 1)
+counter = HashMap.fromListWith (+) . flip zip (repeat 1)
 
 count :: Ord a => a -> Counter a -> Int
 count x m =
-  case Map.lookup x m of
+  case HashMap.lookup x m of
     Just v  -> v
     Nothing -> 0
 

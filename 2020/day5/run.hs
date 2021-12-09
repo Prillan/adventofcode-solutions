@@ -2,12 +2,6 @@ import Data.Bits (xor)
 import Data.Ord (comparing)
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Sequence (Seq)
-import qualified Data.Sequence as Seq
-import Data.Set (Set)
-import qualified Data.Set as Set
 
 parseAll = lines
 

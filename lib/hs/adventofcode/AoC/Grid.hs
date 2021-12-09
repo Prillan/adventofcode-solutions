@@ -1,9 +1,9 @@
 module AoC.Grid where
 
-import qualified Data.Map.Strict as Map
-import Data.Map.Strict (Map)
+import qualified Data.HashMap.Strict as HashMap
+import Data.HashMap.Strict (HashMap)
 
-type MapGrid = Map (Int, Int)
+type MapGrid = HashMap (Int, Int)
 
 readGrid :: Read a => String -> [[a]]
 readGrid = parseGrid (read . pure)
@@ -25,9 +25,9 @@ parseMapGrid parser =
   toMapGrid
   . parseGrid parser
 
-toMapGrid :: [[a]] -> Map (Int, Int) a
+toMapGrid :: [[a]] -> HashMap (Int, Int) a
 toMapGrid xs =
-  Map.fromList [((ci, ri), cell) | (ri, row) <- zip [0..] xs
+  HashMap.fromList [((ci, ri), cell) | (ri, row) <- zip [0..] xs
                                  , (ci, cell) <- zip [0..] row]
 
 ppGrid :: (a -> Char) -> [[a]] -> String
@@ -38,12 +38,12 @@ ppMapGrid pp = ppGrid pp . fromMapGrid
 
 fromMapGrid :: MapGrid a -> [[a]]
 fromMapGrid g =
-  let (cs, rs) = unzip $ Map.keys g
+  let (cs, rs) = unzip $ HashMap.keys g
       cm = maximum cs
       rm = maximum rs
   in fromMapGrid' (cm + 1) (rm + 1) g
 
 fromMapGrid' :: Int -> Int -> MapGrid a -> [[a]]
 fromMapGrid' w h g =
-  map (map (g Map.!))
+  map (map (g HashMap.!))
   $ [[(ci, ri) | ci <- [0..w-1]]  | ri <- [0..h-1]]

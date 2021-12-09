@@ -4,13 +4,16 @@
 import AoC
 import AoC.Grid
 
-import Data.Bits (xor)
-import Data.Ord (comparing)
 import Data.Bifunctor
-import Data.Maybe
+import Data.Foldable
 import Data.List
+import Data.Maybe
+import Data.Ord
+
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)

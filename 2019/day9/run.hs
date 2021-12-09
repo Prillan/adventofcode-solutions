@@ -9,13 +9,13 @@ import Control.Monad.State ( StateT(..)
                            , get
                            , MonadState )
 import Data.Bool (bool)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Maybe (maybe)
 import Pipes
 import qualified Pipes.Prelude as P
 
-type Program = Map Integer Integer
+type Program = HashMap Integer Integer
 
 data ExecInfo = ExecInfo { pc :: Integer
                          , halted :: Bool
@@ -55,7 +55,7 @@ resolveAddress (Relative v) = (v +) <$> gets relativeBase
 
 rawValAt :: MonadState ExecInfo m => Address -> m Integer
 rawValAt addr =
-  maybe 0 id <$> (Map.lookup <$> resolveAddress addr <*> gets memory)
+  maybe 0 id <$> (HashMap.lookup <$> resolveAddress addr <*> gets memory)
 
 modifyPc :: MonadState ExecInfo m => (Integer -> Integer) -> m ()
 modifyPc f = modify (\s@ExecInfo { pc } -> s { pc = f pc })
@@ -74,10 +74,10 @@ paramValue (Position x) = rawValAt x
 writeMemory :: MonadState ExecInfo m => Address -> Integer -> m ()
 writeMemory addr val = do
   addr' <- resolveAddress addr
-  modify (\s@ExecInfo { memory } -> s { memory = Map.insert addr' val memory })
+  modify (\s@ExecInfo { memory } -> s { memory = HashMap.insert addr' val memory })
 
 parseAll :: String -> Program
-parseAll input = Map.fromList $ zip [0..] . read $ '[' : input ++ "]"
+parseAll input = HashMap.fromList $ zip [0..] . read $ '[' : input ++ "]"
 
 consumeInstruction :: MonadState ExecInfo m => m Instruction
 consumeInstruction = do

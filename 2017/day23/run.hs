@@ -1,5 +1,5 @@
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Control.Monad.State
 import Data.Void (Void)
 import Text.Megaparsec hiding (State)
@@ -12,11 +12,11 @@ unsafeRight (Right x) = x
 unsafeRight (Left x) = error $ show x
 
 type Reg = Char
-data ProgramState = PState { program       :: Map Int (Program ())
+data ProgramState = PState { program       :: HashMap Int (Program ())
                            , pointer       :: Int
                            , programLength :: Int
-                           , regs          :: Map Reg Integer
-                           , operations    :: Map String Integer }
+                           , regs          :: HashMap Reg Integer
+                           , operations    :: HashMap String Integer }
 
 instance Show ProgramState where
   show s = "State { pointer = " ++ show (pointer s) ++ ", "
@@ -26,17 +26,17 @@ instance Show ProgramState where
 type Program = State ProgramState
 
 setReg :: Reg -> Integer -> ProgramState -> ProgramState
-setReg r v s = s { regs = Map.insert r v (regs s) }
+setReg r v s = s { regs = HashMap.insert r v (regs s) }
 
-regLookup :: Reg -> Map Reg Integer -> Integer
-regLookup r = maybe 0 id . Map.lookup r
+regLookup :: Reg -> HashMap Reg Integer -> Integer
+regLookup r = maybe 0 id . HashMap.lookup r
 
 incrementOp :: String -> ProgramState -> ProgramState
 incrementOp str s =
   let ops = operations s
-      prev = Map.findWithDefault 0 str ops
+      prev = HashMap.findWithDefault 0 str ops
   in
-    s { operations = Map.insert str (prev + 1) ops }
+    s { operations = HashMap.insert str (prev + 1) ops }
 
 reg :: Reg -> ProgramState -> Integer
 reg r = regLookup r . regs
@@ -117,7 +117,7 @@ parseAll =
 eval :: Program ()
 eval = do
   s <- get
-  case Map.lookup (pointer s) (program s) of
+  case HashMap.lookup (pointer s) (program s) of
     Just instr -> do
       instr
       modify' (\s' -> s' { pointer = pointer s' + 1 })
@@ -127,10 +127,10 @@ eval = do
 part1 :: [Program ()] -> ((), ProgramState)
 part1 instr =
   let initial = PState { pointer = 0
-                       , program = Map.fromList (zip [0..] instr)
+                       , program = HashMap.fromList (zip [0..] instr)
                        , programLength = length instr
-                       , regs = Map.empty
-                       , operations = Map.empty }
+                       , regs = HashMap.empty
+                       , operations = HashMap.empty }
   in
     runState eval initial
 

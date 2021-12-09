@@ -5,18 +5,18 @@
 import AoC
 import AoC.Grid
 
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 parseAll input = read @[Int] $ "[" ++ input ++ "]"
 
 lantern = iterate go
-  where go = Map.fromListWith (+) . concatMap f . Map.toList
+  where go = HashMap.fromListWith (+) . concatMap f . HashMap.toList
         f (0, !n) = [(6, n), (8, n)]
         f (i, !n) = [(i - 1, n)]
 
 
-simulate = lantern . Map.fromListWith (+) . map (,1)
+simulate = lantern . HashMap.fromListWith (+) . map (,1)
 
 part1 = sum . (!! 80) . simulate
 part2 = sum . (!! 256) . simulate

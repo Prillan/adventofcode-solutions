@@ -4,8 +4,8 @@ import Control.Applicative
 
 import Data.List (permutations, minimumBy, maximumBy, maximum)
 import Data.Maybe (fromJust)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Text.Parsec hiding ((<|>))
 
 type Person = String
@@ -20,7 +20,7 @@ data Arrangement = A [Person] Integer
 instance Ord Arrangement where
   compare (A _ x) (A _ y) = compare x y
 
-type Settings = Map (Person, Person) Integer
+type Settings = HashMap (Person, Person) Integer
 
 person :: Stream s m Char => ParsecT s u m String
 person = choice $ map (try.string) persons
@@ -42,14 +42,14 @@ pairing = do
 readPairing :: String -> Either ParseError Pairing
 readPairing = parse pairing ""
 
-unsafeLookup m (p1, p2) = fromJust $ Map.lookup (p1, p2) m <|> Map.lookup (p2, p1) m
+unsafeLookup m (p1, p2) = fromJust $ HashMap.lookup (p1, p2) m <|> HashMap.lookup (p2, p1) m
 happiness m (p1, p2) = fromJust $ (+) <$> lkp (p1, p2) <*> lkp (p2, p1)
-  where lkp (p1, p2) = Map.lookup (p1, p2) m
+  where lkp (p1, p2) = HashMap.lookup (p1, p2) m
 
 unsafeRight (Right x) = x
 
 process input = optimal
-  where setting = Map.fromList . map (toTuple . unsafeRight . readPairing) . lines $ input
+  where setting = HashMap.fromList . map (toTuple . unsafeRight . readPairing) . lines $ input
         arrangements = map (head (persons):) (permutations (drop 1 persons))
         value xs = sum . map (happiness setting) $ zip xs (drop 1 xs ++ [head xs])
         toArrangement xs = A xs (value xs)

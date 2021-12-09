@@ -1,8 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 import           Control.Monad (guard)
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Text.Megaparsec hiding (State)

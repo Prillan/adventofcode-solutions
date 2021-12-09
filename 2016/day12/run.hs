@@ -1,6 +1,6 @@
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import           Data.Void (Void)
 import           Text.Megaparsec hiding (State)
 import           Text.Megaparsec.Char
@@ -55,13 +55,13 @@ fromList def xs =
   let (x':xs') = xs ++ [def]
   in Z [] x' xs'
 
-type State = (Map Reg Val, Zipper Instr)
+type State = (HashMap Reg Val, Zipper Instr)
 
-newState instr = (Map.fromList (zip "abcd" (repeat 0)), fromList Stop instr)
+newState instr = (HashMap.fromList (zip "abcd" (repeat 0)), fromList Stop instr)
 
 val :: State -> Either Val Reg -> Val
 val _ (Left v) = v
-val (m, _) (Right r) = maybe 0 id (Map.lookup r m)
+val (m, _) (Right r) = maybe 0 id (HashMap.lookup r m)
 
 iter :: (a -> a) -> Int -> a -> a
 iter f n = foldr (.) id (replicate n f)
@@ -81,13 +81,13 @@ jnz s v steps
   | v /= 0 && steps <  0 = backward s (negate steps)
 
 cpy :: State -> Val -> Reg -> State
-cpy (m, z) v k  = (Map.insert k v m, z)
+cpy (m, z) v k  = (HashMap.insert k v m, z)
 
 inc :: State -> Reg -> State
-inc (m, z) k = (Map.update (pure . (+1)) k m, z)
+inc (m, z) k = (HashMap.update (pure . (+1)) k m, z)
 
 dec :: State -> Reg -> State
-dec (m, z) k = (Map.update (pure . (+ (-1))) k m, z)
+dec (m, z) k = (HashMap.update (pure . (+ (-1))) k m, z)
 
 exec1 :: State -> State
 exec1 s =
@@ -108,8 +108,8 @@ unsafeRight (Right x) = x
 parseAll = map unsafeRight .
   map (parse instrP "") . lines
 
-part1 = (Map.! 'a') . fst . exec . newState
-part2 = (Map.! 'a') . fst . exec . newState . ((Cpy (Left 1) 'c'):)
+part1 = (HashMap.! 'a') . fst . exec . newState
+part2 = (HashMap.! 'a') . fst . exec . newState . ((Cpy (Left 1) 'c'):)
 
 showState :: State -> String
 showState (st, Z prev c next) =

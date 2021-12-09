@@ -1,7 +1,7 @@
 {-# LANGUAGE TupleSections #-}
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 parse :: String -> ((String, String), [((String, String), Int)])
 parse = go . words
@@ -27,18 +27,18 @@ loeb :: Functor a => a (a x -> x) -> a x
 loeb x = fmap (\a -> a (loeb x)) x
 
 totalBags rules =
-  let ruleMap = Map.fromList rules
+  let ruleMap = HashMap.fromList rules
       lookupCount m x =
         sum
         . map (\(c, n) -> n * (1 + lookupCount m c))
-        $ ruleMap Map.! x
-      ss = Map.fromList
+        $ ruleMap HashMap.! x
+      ss = HashMap.fromList
         . map (\x -> (x, flip lookupCount x))
         . map fst
         $ rules
   in loeb ss
 
-part2 input = totalBags input Map.! ("shiny", "gold")
+part2 input = totalBags input HashMap.! ("shiny", "gold")
 
 main = do
    input <- parseAll <$> readFile "input.txt"

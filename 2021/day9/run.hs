@@ -11,8 +11,8 @@ import Data.Ord (comparing)
 import Data.Bifunctor
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
@@ -38,14 +38,14 @@ hv (i, j) = [ (i + dx, j + dy) | dx <- [-1..1]
 
 hvNeighbors :: MapGrid Int -> Pos -> [(Pos, Int)]
 hvNeighbors m =
-  mapMaybe (\pos -> sequence (pos, pos `Map.lookup` m))
+  mapMaybe (\pos -> sequence (pos, pos `HashMap.lookup` m))
   . hv
 
 neighborVals :: MapGrid Int -> Pos -> [Int]
-neighborVals m = mapMaybe (`Map.lookup` m) . neighbors
+neighborVals m = mapMaybe (`HashMap.lookup` m) . neighbors
 
-lowPoints :: MapGrid Int -> Map Pos Int
-lowPoints m = Map.filterWithKey f m
+lowPoints :: MapGrid Int -> HashMap Pos Int
+lowPoints m = HashMap.filterWithKey f m
   where f pos val = all (> val) $ neighborVals m pos
 
 basin :: MapGrid Int -> Pos -> Int -> Set (Pos, Int)
@@ -72,7 +72,7 @@ part2 m =
   . sortBy (comparing negate)
   . map length
   . toList
-  $ Map.mapWithKey (basin m) (lowPoints m)
+  $ HashMap.mapWithKey (basin m) (lowPoints m)
 
 main = main' "input.txt"
 exampleMain = main' "example.txt"

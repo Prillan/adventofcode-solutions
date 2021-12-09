@@ -1,12 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 import Control.Monad (forM_)
 import Data.List (foldl')
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq(..), (|>), (<|))
 import qualified Data.Sequence as Seq
 
-type Counter a = Map a Int
+type Counter a = HashMap a Int
 
 data Game = Game { players :: Int
                  , turn    :: Int
@@ -18,10 +18,10 @@ emptyGame :: Int -> Game
 emptyGame p = Game { players = p
                    , turn = 0
                    , board = Seq.empty
-                   , scores = Map.empty }
+                   , scores = HashMap.empty }
 
 highscore :: Game -> Int
-highscore = maximum . Map.elems . scores
+highscore = maximum . HashMap.elems . scores
 
 rotateLeft :: Int -> Seq Int -> Seq Int
 rotateLeft _ Empty     = Seq.empty
@@ -34,7 +34,7 @@ rotateRight 0 s         = s
 rotateRight n (s :|> x) = rotateRight (n-1) (x <| s)
 
 addScore :: Counter Int -> Int -> Int -> Counter Int
-addScore s p n = Map.unionWith (+) s (Map.singleton p n)
+addScore s p n = HashMap.unionWith (+) s (HashMap.singleton p n)
 
 stepGame :: Game -> Int -> Game
 stepGame g@Game {..} i

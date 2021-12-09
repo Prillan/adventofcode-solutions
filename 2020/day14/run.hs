@@ -11,8 +11,8 @@ import Data.Ord (comparing)
 import Data.Bifunctor
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
@@ -23,9 +23,9 @@ import qualified Data.Set as Set
 data Mask = Mask { mask0 :: Integer
                  , mask1 :: Integer }
   deriving Show
-type State = (Mask, Map Int Integer)
+type State = (Mask, HashMap Int Integer)
 
-initial = (Mask 0 0, Map.empty)
+initial = (Mask 0 0, HashMap.empty)
 
 parse :: String -> Either Mask (Int, Integer)
 parse x = fromJust $ (Left <$> parseMask x) <|> (Right <$> parseMem x)
@@ -47,9 +47,9 @@ parseAll p =
   map p . lines
 
 step (_, vals) (Left m) = (m, vals)
-step (m, vals) (Right (i, v)) = (m, Map.insert i (applyMask m v) vals)
+step (m, vals) (Right (i, v)) = (m, HashMap.insert i (applyMask m v) vals)
 
-part1 = sum . Map.elems . snd . foldl' step initial
+part1 = sum . HashMap.elems . snd . foldl' step initial
 
 -- Part 2
 
@@ -71,15 +71,15 @@ applyMask2 (Mask2 fs) v =
 step2 (_, vals) (Left m) = (m, vals)
 step2 (ms, vals) (Right (i, v)) =
   let !vals' =
-        flip Map.union vals -- flip needed to prefer new values
-        . Map.fromList
+        flip HashMap.union vals -- flip needed to prefer new values
+        . HashMap.fromList
         . map (,v)
         . map (flip applyMask2 i)
         $ ms
   in
     (ms, vals')
 
-part2 = sum . Map.elems . snd . foldl' step2 ([], Map.empty)
+part2 = sum . HashMap.elems . snd . foldl' step2 ([], HashMap.empty)
 
 main = do
    input <- readFile "input.txt"

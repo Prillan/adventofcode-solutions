@@ -10,8 +10,8 @@ import Data.Ord (comparing)
 import Data.Bifunctor
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
@@ -52,26 +52,26 @@ rev = \case 0 -> "abcefg"
             8 -> "abcdefg"
             9 -> "abcdfg"
 
-llkp :: Map Char Char -> String -> Maybe Int
-llkp m = lkp . sort . map (m Map.!)
+llkp :: HashMap Char Char -> String -> Maybe Int
+llkp m = lkp . sort . map (m HashMap.!)
 
-llkpNum :: Map Char Char -> [String] -> Maybe Int
+llkpNum :: HashMap Char Char -> [String] -> Maybe Int
 llkpNum m = fmap (read @Int . concatMap show) . traverse (llkp m)
 
-initial :: [String] -> Map Char [Char]
+initial :: [String] -> HashMap Char [Char]
 initial xs =
   let Just d1 = find ((== 2) . length) xs
       Just d4 = find ((== 4) . length) xs
       Just d7 = find ((== 3) . length) xs
       Just d8 = find ((== 7) . length) xs
 
-  in Map.fromListWith intersect $ map (,rev 1) d1
+  in HashMap.fromListWith intersect $ map (,rev 1) d1
                                ++ map (,rev 4) d4
                                ++ map (,rev 7) d7
                                ++ map (,rev 8) d8
 
 solve xs = filter (\m -> all (isJust . llkp m) xs)
-           . map (Map.fromList . zip "abcdefg")
+           . map (HashMap.fromList . zip "abcdefg")
            . filter ((== 7) . length . nub)
            . sequence
            . toList

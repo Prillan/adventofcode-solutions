@@ -3,14 +3,14 @@ import Data.List ((\\))
 import Data.Maybe (mapMaybe, listToMaybe)
 import Data.Vector (Vector)
 import qualified Data.Vector as V
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 newtype Password = Password (Vector Int)
 
 strRep :: Password -> String
 strRep = V.toList . V.map (az !!) . coerce
-fromStrRep = Password . V.fromList . mapMaybe (`Map.lookup` rev)
+fromStrRep = Password . V.fromList . mapMaybe (`HashMap.lookup` rev)
 
 instance Show Password where
   show p = strRep p ++ " " ++ s ++ " " ++ show (toInt p)
@@ -39,10 +39,10 @@ instance Num Password where
 upper = base ^ 8
 
 az = ['a'..'z']
-rev :: Map Char Int
-rev = Map.fromList $ zip az [0..]
+rev :: HashMap Char Int
+rev = HashMap.fromList $ zip az [0..]
 
-bad = mapMaybe (flip Map.lookup rev) "iol"
+bad = mapMaybe (flip HashMap.lookup rev) "iol"
 
 base = length az
 

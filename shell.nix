@@ -18,6 +18,7 @@ in { lang ? "hs", nixpkgs ? import ./pkgs.nix, extraDeps ? defaultExtraDeps }:
         hpkgs.MonadRandom
         hpkgs.vector
         hpkgs.aoc
+        hpkgs.unordered-containers
       ] ++ (extraDeps.hs hpkgs);
     in [ (haskellPackages.ghcWithPackages pkgs) ];
     asm = with nixpkgs; [ nasm manpages gdb glibc.dev ];

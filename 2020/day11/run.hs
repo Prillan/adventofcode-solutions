@@ -7,8 +7,8 @@ import Data.Ord (comparing)
 import Data.Bifunctor (bimap)
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 
 data Seat = Floor | Empty | Occupied
   deriving (Show, Eq)
@@ -32,7 +32,7 @@ dirs =
   , (1, 1) ]
 
 neighbors g (c, r) =
-  mapMaybe (flip Map.lookup g)
+  mapMaybe (flip HashMap.lookup g)
   . map (\(dx, dy) -> (c + dx, r + dy))
   $ dirs
 
@@ -49,7 +49,7 @@ nearest g (ci, ri) (dx, dy) =
   . mapMaybe id
   . dropWhile (== Just Floor)
   . takeWhile isJust
-  . map (flip Map.lookup g)
+  . map (flip HashMap.lookup g)
   . drop 1
   . iterate (bimap (+ dx) (+ dy))
   $ (ci, ri)
@@ -62,15 +62,15 @@ rule2 g pos s =
       | count Occupied xs >= 5 -> Empty
     _ -> s
 
-step rule g = let !r = Map.mapWithKey (rule g) g in r
+step rule g = let !r = HashMap.mapWithKey (rule g) g in r
 
 part1 =
   count Occupied
-  . Map.elems
+  . HashMap.elems
   . fixpoint (step rule1)
 part2 =
   count Occupied
-  . Map.elems
+  . HashMap.elems
   . fixpoint (step rule2)
 
 main = do

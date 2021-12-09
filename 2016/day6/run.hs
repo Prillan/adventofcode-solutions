@@ -1,12 +1,12 @@
 import           Data.List (sortOn)
-import qualified Data.Map.Strict as Map
+import qualified Data.HashMap.Strict as HashMap
 
 occurBy :: (Int -> Int) -> [String] -> String
 occurBy f =
-  map (fst . head . sortOn (f . snd) . Map.toList)
+  map (fst . head . sortOn (f . snd) . HashMap.toList)
   . foldr (zipWith update) empties
-  where empties = repeat Map.empty
-        update k m = Map.insertWith (+) k 1 m
+  where empties = repeat HashMap.empty
+        update k m = HashMap.insertWith (+) k 1 m
 
 part1 :: [String] -> String
 part1 = occurBy negate

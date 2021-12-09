@@ -3,8 +3,8 @@
 import           Control.Monad (guard)
 import           Data.Bifunctor (first, second)
 import           Data.List (permutations, sort, minimum)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import           Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import           Data.PriorityQueue.FingerTree (PQueue)
 import qualified Data.PriorityQueue.FingerTree as PQueue
 import           Data.Set (Set)
@@ -27,8 +27,8 @@ readCell '#' = Wall
 readCell '.' = Open
 readCell x = Spot (read [x])
 
-parseAll :: String -> Map (Int, Int) Cell
-parseAll = Map.fromList . concat . zipWith parseLine [0..] . lines
+parseAll :: String -> HashMap (Int, Int) Cell
+parseAll = HashMap.fromList . concat . zipWith parseLine [0..] . lines
   where parseLine y line = zipWith (\x c -> ((x, y), readCell c)) [0..] line
 
 astar :: (Ord a, Eq a) => a -> (a -> [a]) -> (a -> Bool) -> (a -> Int) -> (Int, a)
@@ -49,25 +49,25 @@ astar initial neighbours done h = solve' Set.empty (PQueue.singleton 0 (0, initi
 
 type State = (Int, Int)
 
-neighboursOf :: Map (Int, Int) Cell -> (Int, Int) -> [(Int, Int)]
+neighboursOf :: HashMap (Int, Int) Cell -> (Int, Int) -> [(Int, Int)]
 neighboursOf m (x, y) = do
   (x', y') <- [(x, y-1), (x-1, y), (x, y+1), (x+1, y)]
-  Just cell <- pure $ Map.lookup (x', y') m
+  Just cell <- pure $ HashMap.lookup (x', y') m
   guard $ not (wall cell)
   pure (x', y')
 
-find :: Eq v => v -> Map k v -> [k]
-find v = map fst . filter ((== v) . snd) . Map.toList
+find :: Eq v => v -> HashMap k v -> [k]
+find v = map fst . filter ((== v) . snd) . HashMap.toList
 
 d :: (Int, Int) -> (Int, Int) -> Int
 d (x0, y0) (x1, y1) =
   abs (x1 - x0) + abs (y1 - y0)
 
-graphify :: Map (Int, Int) Cell -> ([Int], Map (Int, Int) Int)
+graphify :: HashMap (Int, Int) Cell -> ([Int], HashMap (Int, Int) Int)
 graphify m =
-  let numbers = sort . concatMap (cellNum.snd) . Map.toList $ m
+  let numbers = sort . concatMap (cellNum.snd) . HashMap.toList $ m
   in
-    (numbers, Map.fromList $ do
+    (numbers, HashMap.fromList $ do
       i0 <- numbers
       i1 <- numbers
       guard $ i0 < i1
@@ -77,7 +77,7 @@ graphify m =
       pure $ ((i0, i1), steps))
 
 
-ts :: [Int] -> Map (Int, Int) Int -> Bool -> Int
+ts :: [Int] -> HashMap (Int, Int) Int -> Bool -> Int
 ts (start:numbers) graph addZero =
   minimum $ do
     permuted <- permutations numbers
@@ -86,7 +86,7 @@ ts (start:numbers) graph addZero =
   where dist n0 n1 =
           let x = min n0 n1
               y = max n0 n1
-              Just d = Map.lookup (x, y) graph
+              Just d = HashMap.lookup (x, y) graph
           in d
 
 

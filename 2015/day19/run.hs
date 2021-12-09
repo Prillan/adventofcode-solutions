@@ -1,8 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 import           Data.Aeson
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, isPrefixOf, sortBy)
-import           Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
 import           Data.Maybe (mapMaybe)
 import qualified Data.Set as Set
 import           Data.Vector ((!), (!?))

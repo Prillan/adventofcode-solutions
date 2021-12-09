@@ -1,6 +1,6 @@
 import Data.Maybe (maybe)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Void (Void)
@@ -22,22 +22,22 @@ connectionP = do
   rest <- sepBy1 num (string ", ")
   pure $ (x1, rest)
 
-parseAll = Map.fromList . map unsafeRight .
+parseAll = HashMap.fromList . map unsafeRight .
   map (parse connectionP "") . filter (not . null) . lines
 
-collect :: Int -> Map Int [Int] -> Set Int
+collect :: Int -> HashMap Int [Int] -> Set Int
 collect g input = collect' (Set.singleton g)
   where collect' s =
           let s' = Set.union s $ Set.fromList $ do
                 e <- Set.toList s
-                maybe [] id (Map.lookup e input)
+                maybe [] id (HashMap.lookup e input)
           in
             if s' == s
             then s
             else collect' s'
 
 part1 = length . collect 0
-part2 input = length . Set.fromList . map (flip collect input) $ Map.keys input
+part2 input = length . Set.fromList . map (flip collect input) $ HashMap.keys input
 
 main = do
    input <- parseAll <$> readFile "input.txt"

@@ -4,8 +4,8 @@ import Data.Bool
 import Data.Bits (xor)
 import Data.Maybe
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
 import Data.Sequence (Seq)
 import qualified Data.Sequence as Seq
 import Data.Set (Set)
@@ -98,7 +98,7 @@ split (Grid g) =
               | r <- [0,d..size-1] ]
 
 expand rules g =
-  case Map.lookup (asKey g) rules of
+  case HashMap.lookup (asKey g) rules of
     Just o -> o
     _ -> g
 
@@ -123,7 +123,7 @@ start = unsafeRight $ parse gridP "" ".#./..#/###"
 on :: Grid -> Int
 on (Grid g) = length . filter id . concat . map toList . toList $ g
 
-buildRules = Map.fromList . variations
+buildRules = HashMap.fromList . variations
 
 solve i input = on $ iterate (step (buildRules input)) start !! i
 

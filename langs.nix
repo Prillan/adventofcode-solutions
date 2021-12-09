@@ -9,6 +9,7 @@
       ghcPkgs = hpkgs:
         with hpkgs; [
           MonadRandom
+
           aeson
           aoc
           cryptonite
@@ -18,6 +19,7 @@
           multiset
           pipes
           split
+          unordered-containers
           vector
         ];
     in [ (haskellPackages.ghcWithPackages ghcPkgs) ];

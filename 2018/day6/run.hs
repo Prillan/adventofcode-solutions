@@ -1,17 +1,15 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
+import AoC
+
+import Data.Foldable (toList)
 import Data.Ord (comparing)
 import Data.List (sortBy)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 
-type Counter a = Map a Int
-
-counter :: Ord a => [a] -> Counter a
-counter = Map.fromListWith (+) . flip zip (repeat 1)
-
 maxCount :: Counter a -> Int
-maxCount = maximum . map snd . Map.toList
+maxCount = maximum . toList
 
 parseAll :: String -> [Point]
 parseAll = map read

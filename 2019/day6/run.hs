@@ -2,10 +2,10 @@ module Main (main) where
 
 import Control.Arrow ((***), (&&&), second)
 import Data.List
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.HashMap.Strict (HashMap)
+import qualified Data.HashMap.Strict as HashMap
+import Data.HashSet (HashSet)
+import qualified Data.HashSet as HashSet
 
 type Orbit = (String, String)
 
@@ -15,39 +15,41 @@ parse = (id *** drop 1) . break (== ')')
 parseAll :: String -> [Orbit]
 parseAll = map parse . lines
 
-children :: [Orbit] -> Map String [String]
-children = Map.fromListWith (++) . map (second pure)
+children :: [Orbit] -> HashMap String [String]
+children = HashMap.fromListWith (++) . map (second pure)
 
-parent :: [Orbit] -> Map String String
-parent = Map.fromList . map (snd &&& fst)
+parent :: [Orbit] -> HashMap String String
+parent = HashMap.fromList . map (snd &&& fst)
 
-nodes :: Map String [String] -> Set String
+nodes :: HashMap String [String] -> HashSet String
 nodes orbitedBys =
-  Set.union (Map.keysSet orbitedBys)
-            (Set.fromList $ concat $ Map.elems orbitedBys)
+  HashSet.union (HashMap.keysSet orbitedBys)
+                (HashSet.fromList $ concat $ HashMap.elems orbitedBys)
 
 loeb :: Functor a => a (a x -> x) -> a x
 loeb x = fmap (\a -> a (loeb x)) x
 
-buildCountSolver :: Map String [String] -> Map String (Map String Int -> Int)
+buildCountSolver :: HashMap String [String] -> HashMap String (HashMap String Int -> Int)
 buildCountSolver orbitedBys =
   let (others, leafs) =
-        partition (`Map.member` orbitedBys) . Set.toList $ nodes orbitedBys
+        partition (`HashMap.member` orbitedBys)
+        . HashSet.toList
+        $ nodes orbitedBys
       leafCells = zip leafs (repeat (const 0))
       otherCells = map (\n -> (n, step n)) others
       step n counts =
-        sum . map (+ 1) . map (counts Map.!) $ orbitedBys Map.! n
+        sum . map (+ 1) . map (counts HashMap.!) $ orbitedBys HashMap.! n
   in
-    Map.fromList $ leafCells ++ otherCells
+    HashMap.fromList $ leafCells ++ otherCells
 
-path :: Map String String -> String -> [String]
+path :: HashMap String String -> String -> [String]
 path _ [] = []
 path _ "COM" = ["COM"]
 path parents leaf =
-  leaf:path parents (parents Map.! leaf)
+  leaf:path parents (parents HashMap.! leaf)
 
 part1 :: [Orbit] -> Int
-part1 = sum . Map.elems . loeb . buildCountSolver . children
+part1 = sum . HashMap.elems . loeb . buildCountSolver . children
 
 part2 :: [Orbit] -> Int
 part2 orbits =
