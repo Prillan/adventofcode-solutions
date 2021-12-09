@@ -2,6 +2,10 @@
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import           Data.Vector (Vector)
+import qualified Data.Vector as V
+import           Data.Vector.Mutable (MVector)
+import qualified Data.Vector.Mutable as VM
 import           Data.Void (Void)
 import           Text.Megaparsec hiding (State)
 import           Text.Megaparsec.Char
@@ -15,7 +19,7 @@ data Instr = Cpy ValReg ValReg
            | Dec ValReg
            | Tgl ValReg
            | Stop
-  deriving Show
+  deriving (Show, Eq)
 
 numP = read <$> ((++) <$> many (char '-') <*> some digitChar)
 regP = oneOf "abcd"
@@ -49,7 +53,7 @@ data Zipper a = Z [a] a [a]
 instance Functor Zipper where
   fmap f (Z l c r) = Z (f <$> l) (f c) (f <$> r)
 
-current (Z _ c _) = c
+-- current (Z _ c _) = c
 
 left (Z [] _ _) = undefined
 left (Z (l:ls) c rs) = Z ls l (c:rs)
@@ -61,29 +65,30 @@ end (Z _ _ []) = True
 end (Z _ Stop _) = True
 end _ = False
 
-fromList :: a -> [a] -> Zipper a
-fromList def xs =
-  let (x':xs') = xs ++ repeat def
-  in Z (repeat def) x' xs'
+-- fromList :: a -> [a] -> Zipper a
+-- fromList def xs =
+--   let (x':xs') = xs ++ repeat def
+--   in Z (repeat def) x' xs'
 
-type State = (Map Reg Val, Zipper Instr)
+type Regs = Map Reg Val
+type State = (Regs, Int, Vector Instr)
 
-newState instr = (Map.fromList (zip "abcd" (repeat 0)), fromList Stop instr)
+newState instr = ( Map.fromList (zip "abcd" (repeat 0))
+                 , 0
+                 , V.fromList instr)
 
 val :: State -> Either Val Reg -> Val
 val _ (Left v) = v
-val (m, _) (Right r) = maybe 0 id (Map.lookup r m)
+val (m, _, _) (Right r) = m Map.! r
 
 iter :: (a -> a) -> Int -> a -> a
 iter f n = foldr (.) id (replicate n f)
 
 forward :: State -> Val -> State
-forward s 0 = s
-forward (regs, z) n = (regs, iter right n z)
+forward (r, !p, i) n = (r, p + n, i)
 
 backward :: State -> Val -> State
-backward s 0 = s
-backward (regs, z) n = (regs, iter left n z)
+backward (r, !p, i) n = (r, p - n, i)
 
 jnz :: State -> Val -> Val -> State
 jnz s v steps
@@ -92,13 +97,13 @@ jnz s v steps
   | v /= 0 && steps <  0 = backward s (negate steps)
 
 cpy :: State -> Val -> Reg -> State
-cpy (!m, z) v k  = (Map.insert k v m, z)
+cpy (!m, p, i) v k  = (Map.insert k v m, p, i)
 
 inc :: State -> Reg -> State
-inc (!m, z) k = (Map.update (pure . (+1)) k m, z)
+inc (!m, p, i) k = (Map.update (pure . (+1)) k m, p, i)
 
 dec :: State -> Reg -> State
-dec (!m, z) k = (Map.update (pure . (+ (-1))) k m, z)
+dec (!m, p, i) k = (Map.update (pure . (+ (-1))) k m, p, i)
 
 tgl :: State -> Val -> State
 tgl s v
@@ -108,9 +113,12 @@ tgl s v
           if v >= 0
             then (forward, backward)
             else (backward, forward)
-        (m, Z l c r) = d1 s (abs v)
+        (m, p, i) = d1 s (abs v)
+        !i' = case i V.!? p of
+                Just instr -> V.modify (\v -> VM.write v p (tgl' instr)) i
+                _          -> i
     in
-      d2 (m, Z l (tgl' c) r) (abs v)
+      d2 (m, p, i') (abs v)
 
 tgl' :: Instr -> Instr
 tgl' Stop = Stop
@@ -120,9 +128,11 @@ tgl' (Inc r) = Dec r
 tgl' (Dec r) = Inc r
 tgl' (Tgl v) = Inc v
 
+current (_, p, i) = maybe Stop id (i V.!? p)
+
 exec1 :: State -> State
 exec1 s =
-  let !s' = case current (snd s) of
+  let !s' = case current s of
               Jnz v steps -> jnz s (val s v) ((val s steps)-1)
               Cpy v (Right r) -> cpy s (val s v) r
               Inc (Right r) -> inc s r
@@ -134,7 +144,7 @@ exec1 s =
     forward s' 1
 
 exec :: State -> State
-exec = head . dropWhile (not.end.snd) . iterate exec1
+exec = head . dropWhile ((/= Stop) . current) . iterate exec1
 
 unsafeRight (Right x) = x
 
@@ -142,8 +152,8 @@ parseAll = map unsafeRight .
   map (parse instrP "") . lines
 
 run input x =
-  let (m, z) = newState input
-      (regs, _) = exec (Map.insert 'a' x m, z)
+  let (m, p, i) = newState input
+      (regs, _, _) = exec (Map.insert 'a' x m , p, i)
   in regs Map.! 'a'
 
 part1 input = run input 7
