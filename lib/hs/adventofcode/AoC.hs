@@ -114,8 +114,8 @@ median :: (Foldable t, Ord a, Fractional a) => t a -> a
 median xs =
   case (length xs `divMod` 2, sort (toList xs)) of
     (_, []) -> error "median of empty list"
-    ((n, 0), s) -> s !! n
-    ((n, _), s) -> sum (take 2 . drop n $ s) / 2
+    ((n, 1), s) -> s !! n
+    ((n, _), s) -> sum (take 2 . drop (n - 1) $ s) / 2
 
 mean :: (Foldable t, Eq a, Fractional a) => t a -> a
 mean xs =
