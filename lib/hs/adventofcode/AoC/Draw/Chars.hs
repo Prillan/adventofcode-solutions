@@ -15,12 +15,15 @@ readLetters =
 
 letters =
   let m = [ ('C', lc)
+          , ('E', le)
+          , ('G', lg)
           , ('H', lh)
           , ('J', lj)
           , ('K', lk)
           , ('L', ll)
           , ('P', lp)
           , ('R', lr)
+          , ('U', lu)
           , ('Y', ly)
           , ('Z', lz)
           ]
@@ -31,7 +34,8 @@ letters =
 readLetter :: [String] -> Either String Char
 readLetter block =
   let (_, m) = letters
-  in case HashMap.lookup block m of
+      padded = map (\l -> take 5 (l ++ repeat ' ')) block
+  in case HashMap.lookup padded m of
        Just l  -> Right l
        Nothing -> Left $ "No letter mapping found for this block: \n"
                         ++ unlines block
@@ -43,6 +47,20 @@ lc = [ " XX  "
      , "X    "
      , "X  X "
      , " XX  "
+     ]
+le = [ "XXXX "
+     , "X    "
+     , "XXX  "
+     , "X    "
+     , "X    "
+     , "XXXX "
+     ]
+lg = [ " XX  "
+     , "X  X "
+     , "X    "
+     , "X XX "
+     , "X  X "
+     , " XXX "
      ]
 lh = [ "X  X "
      , "X  X "
@@ -85,6 +103,13 @@ lr = [ "XXX  "
      , "XXX  "
      , "X X  "
      , "X  X "
+     ]
+lu = [ "X  X "
+     , "X  X "
+     , "X  X "
+     , "X  X "
+     , "X  X "
+     , " XX  "
      ]
 ly = [ "X   X"
      , "X   X"
