@@ -1,14 +1,33 @@
+{-# LANGUAGE LambdaCase #-}
 
-readString s = readString' . init . tail $ s
-  where readHex x = read ("'\\x" ++ x ++ "'") :: Char
-        readString' [] = []
-        readString' [x] = [x]
-        readString' ('\\':'x':xs) =
-          readHex (take 2 xs):readString' (drop 2 xs)
-        readString' ('\\':y:xs) = y:readString' xs
-        readString' (x:xs) = x:readString' xs
+readString :: String -> String
+readString = go . tail . init
+  where go :: String -> String
+        go = \case
+          []                  -> []
+          '\\':'x':c1:c2:rest -> hexToChar c1 c2:go rest
+          '\\':c:rest         -> c:go rest
+          c:rest              -> c:go rest
 
-process input = (sum . map length $ ls) - (sum . map length . map readString $ ls)
-  where ls = lines input
+hexToChar :: Char -> Char -> Char
+hexToChar c1 c2 = read $ "'\\x" ++ [c1, c2] ++ "'"
 
-main = readFile "input.txt" >>= print . process
+
+part1 input =
+  let sl = length $ concat input
+      ml = length $ concatMap readString input
+  in sl - ml
+
+
+part2 input =
+  let sl = length $ concat input
+      el = length $ concatMap show input
+  in el - sl
+
+main = main' "input.txt"
+exampleMain = main' "example.txt"
+
+main' file = do
+  input <- lines <$> readFile file
+  print (part1 input)
+  print (part2 input)
