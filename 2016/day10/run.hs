@@ -55,7 +55,7 @@ parseAll = map unsafeRight .
   map (parse inst "") . lines
 
 eval :: [Inst] -> Logic
-eval = snd . head . dropWhile (not.null.fst) . iterate eval' . (,empty)
+eval = snd . until (null . fst) eval' . (,empty)
   where eval' :: ([Inst], Logic) -> ([Inst], Logic)
         eval' (inst, l) = first reverse $ foldl step ([], l) inst
 

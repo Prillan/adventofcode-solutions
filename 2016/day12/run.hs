@@ -101,7 +101,7 @@ exec1 s =
     forward s' 1
 
 exec :: State -> State
-exec = head . dropWhile (not.end.snd) . iterate exec1
+exec = until (end . snd) exec1
 
 unsafeRight (Right x) = x
 
