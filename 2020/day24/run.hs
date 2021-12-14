@@ -92,7 +92,7 @@ part1 :: [[Dir]] -> Int
 part1 = Set.size . setup
 
 part2 :: [[Dir]] -> Int
-part2 input = Set.size (iterate' step (setup input) !! 100)
+part2 input = Set.size (iterateN' 100 step (setup input))
 
 main = main' "input.txt"
 exampleMain = main' "example.txt"

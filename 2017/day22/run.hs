@@ -1,4 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
+import AoC (iterateN')
+
 import Control.Applicative (liftA2, some, (<|>))
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
@@ -107,16 +109,9 @@ burst2 (!pos, !dir, !grid, !count) =
   in
     (pos', dir', grid', count')
 
-iterate' :: Int -> (a -> a) -> a -> a
-iterate' 0 _ x = x
-iterate' n f x =
-  let !x' = f x
-  in
-    iterate' (n - 1) f x'
-
 runFor :: Int -> (VirusState -> VirusState) -> (Int, Grid) -> VirusState
 runFor n burstMode (width, grid) =
-  iterate' n burstMode (V2 (width `div` 2, width `div` 2), V2 (-1, 0), grid, 0)
+  iterateN' n burstMode (V2 (width `div` 2, width `div` 2), V2 (-1, 0), grid, 0)
 
 part1 :: (Int, Grid) -> Int
 part1 = (\(_, _, _, c) -> c) . runFor 10000 burst1

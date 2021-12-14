@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedLists #-}
+import AoC
+
 import           Data.List (intercalate)
 import           Data.Maybe (mapMaybe)
 import           Data.Vector ((!), (!?))
@@ -51,8 +53,8 @@ step' grid = V.map (\y -> V.map (\x -> f x y) [0..s-1]) [0..s-1]
 on :: Grid -> Int
 on = V.sum . V.map (V.length . V.filter id)
 
-part1 g = on $ (iterate step g) !! 100
-part2 g = on $ (iterate step' g') !! 100
+part1 g = on $ iterateN 100 step g
+part2 g = on $ iterateN 100 step' g'
   where g' = turnOnCorners g
 
 main = do

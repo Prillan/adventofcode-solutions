@@ -55,7 +55,7 @@ rule g pos =
     _ -> False
 
 part1 initial =
-  let (_, afterBoot) = iterate (uncurry step) ((8,8,1), initial) !! 6
+  let (_, afterBoot) = iterateN' 6 (uncurry step) ((8,8,1), initial)
   in Set.size afterBoot
 
 
@@ -100,7 +100,7 @@ rule4 g pos =
 
 
 part2 initial =
-  let (_, afterBoot) = iterate (uncurry step4) ((8,8,1,1), initial) !! 6
+  let (_, afterBoot) = iterateN' 6 (uncurry step4) ((8,8,1,1), initial)
   in Set.size afterBoot
 
 -- Runs in ~2s

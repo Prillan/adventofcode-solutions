@@ -4,6 +4,8 @@
 {-# LANGUAGE DeriveTraversable #-}
 module AoC ( tce
            , fixpoint
+           , iterateN
+           , iterateN'
 
            -- vectors
            , V2(V2)
@@ -61,6 +63,19 @@ fixpoint f a =
   let xs = iterate f a
   in fst . head . filter (uncurry (==)) $ zip (drop 1 xs) xs
 
+
+iterateN :: Int -> (a -> a) -> a -> a
+iterateN 0 f = id
+iterateN n f = go n
+  where go 1 = f
+        go n = f . go (n - 1)
+{-# INLINABLE iterateN #-}
+
+iterateN' :: Int -> (a -> a) -> a -> a
+iterateN' 0 _ x = x
+iterateN' 1 f !x = f x
+iterateN' n f !x = iterateN' (n - 1) f (f x)
+{-# INLINABLE iterateN' #-}
 
 newtype V2 a = V2 (a, a)
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)

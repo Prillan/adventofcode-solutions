@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+import AoC
 import Data.Bits (xor)
 import Data.Bool (bool)
 
@@ -9,8 +10,6 @@ dragon a =
   let b = map not $ reverse a
       c = a ++ [False] ++ b
   in c
-
-iterated n = foldr (.) id (replicate n dragon)
 
 bits :: [Bool] -> String
 bits = map (bool '0' '1')
@@ -23,7 +22,7 @@ unbits = map f
 fill :: Int -> [Bool] -> [Bool]
 fill len start =
   let n = ceiling (logBase 2 $ (fromIntegral (len + 1) / fromIntegral (length start + 1))) - 1
-      a = iterated n start
+      a = iterateN n dragon start
       m = len - (2^n * (length start + 1))
       b = map not $ take m $ reverse a
   in a ++ [False] ++ b

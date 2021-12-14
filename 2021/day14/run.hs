@@ -43,8 +43,7 @@ charCounts h l =
 countsAfter :: Rules -> Int -> String -> Counter Char
 countsAfter rules n input =
     charCounts (head input) (last input)
-    . (!! n)
-    . iterate (step rules)
+    . iterateN n (step rules)
     $ pairCounts input
 
 solve :: Int -> (String, Rules) -> Int
