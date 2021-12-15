@@ -1,5 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE TupleSections #-}
+import AoC.Search
+
 import           Control.Monad (guard)
 import           Data.Bifunctor (first, second)
 import           Data.List (permutations, sort, minimum)
@@ -31,22 +33,6 @@ parseAll :: String -> HashMap (Int, Int) Cell
 parseAll = HashMap.fromList . concat . zipWith parseLine [0..] . lines
   where parseLine y line = zipWith (\x c -> ((x, y), readCell c)) [0..] line
 
-astar :: (Ord a, Eq a) => a -> (a -> [a]) -> (a -> Bool) -> (a -> Int) -> (Int, a)
-astar initial neighbours done h = solve' Set.empty (PQueue.singleton 0 (0, initial))
-  where --solve' :: Set State -> PQueue Int (Int, State) -> (Int, State)
-        solve' visited queue =
-          let Just ((!steps, !current), !queue') = PQueue.minView queue
-              visited' = Set.insert current visited
-              valid s = not (Set.member s visited')
-              queue'' = foldr (uncurry PQueue.insert) queue'
-                     . map (\s -> (h s + steps + 1, (steps + 1, s)))
-                     . filter valid $ neighbours current
-          in
-            if done current
-              then (steps, current)
-              else  solve' visited' queue''
-
-
 type State = (Int, Int)
 
 neighboursOf :: HashMap (Int, Int) Cell -> (Int, Int) -> [(Int, Int)]
@@ -73,7 +59,10 @@ graphify m =
       guard $ i0 < i1
       pos0 <- find (Spot i0) m
       pos1 <- find (Spot i1) m
-      let (steps, _) = astar pos0 (neighboursOf m) (pos1 ==) (d pos1)
+      let Just steps = astar_ (pos1 ==)
+                              (map (,1) . neighboursOf m)
+                              (d pos1)
+                              pos0
       pure $ ((i0, i1), steps))
 
 

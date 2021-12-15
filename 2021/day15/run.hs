@@ -30,9 +30,10 @@ hvNeighbors m =
 minPathCost :: MapGrid Int -> Int
 minPathCost grid =
   let br = maximum $ HashMap.keys grid
-  in dijkstra_ (br ==)
-               (hvNeighbors grid)
-               (0, 0)
+      Just cost = dijkstra_ (br ==)
+                            (hvNeighbors grid)
+                            (0, 0)
+  in cost
 
 extend :: Int -> [Int] -> [Int]
 extend = go

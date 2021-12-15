@@ -20,6 +20,7 @@ deq (Queue [] []) = Nothing
 deq (Queue (x:xs) ys) = Just (x, Queue xs ys)
 deq (Queue [] ys) = deq (Queue (reverse ys) [])
 
+-- TODO: Replace with AoC.Search.bfs
 bfs :: (Ord a, Eq a) => a -> (a -> [a]) -> (a -> Bool) -> Maybe (Int, a)
 bfs state neighbours done = bfs' Set.empty (enq newQueue (0, state))
   where bfs' visited queue = do

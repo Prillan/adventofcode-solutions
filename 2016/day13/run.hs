@@ -1,16 +1,8 @@
 {-# LANGUAGE TupleSections #-}
-import           Control.Monad (guard)
-import           Data.Bits
-import           Data.Set (Set)
-import qualified Data.Set as Set
-
-
-data Queue a = Queue [a] [a]
-newQueue = Queue [] []
-enq (Queue xs ys) y = Queue xs (y:ys)
-deq (Queue [] []) = Nothing
-deq (Queue (x:xs) ys) = Just (x, Queue xs ys)
-deq (Queue [] ys) = deq (Queue (reverse ys) [])
+import AoC.Search (bfs_)
+import Control.Monad (guard)
+import Data.Bits
+import Data.Maybe (fromJust)
 
 f x y = x*x + 3*x + 2*x*y + y + y*y
 
@@ -26,20 +18,6 @@ printGrid :: Int -> Int -> Int -> String
 printGrid input w h =
   unlines [[drawCell input x y | x <- [0..w]] | y <- [0..h]]
 
-bfs :: (Ord a, Eq a) => a -> (a -> [a]) -> (a -> Bool) -> Maybe (Int, a)
-bfs state neighbours done = bfs' Set.empty (enq newQueue (0, state))
-  where bfs' visited queue = do
-          ((steps, current), queue') <- deq queue
-          let visited' = Set.insert current visited
-              valid s = not (Set.member s visited')
-              queue'' = foldr (flip enq) queue'
-                        . map (steps+1,)
-                        . filter valid
-                        . neighbours $ current
-          if done current
-            then pure (steps, current)
-            else bfs' visited' queue''
-
 woop :: [(a -> a)] -> (a, a) -> [(a, a)]
 woop fs (x, y) = do
   f <- fs
@@ -52,21 +30,21 @@ neighboursOf input pos = do
   guard $ not $ wall input x' y'
   pure (x', y')
 
-part1Input = 1358
-part1 =
-  let Just (ans, _) = bfs (1, 1) (neighboursOf part1Input) (== (31, 39))
-  in ans
+minCost input target = bfs_ (== target) (neighboursOf input) (1, 1)
 
--- Hacky solution!
--- Runs in 5 seconds on my laptop.
-part2 = length $ do
+part1 input =
+  fromJust $ minCost input (31, 39)
+
+-- TODO: Limit bfs search to stop after 50 steps.
+part2 input = length $ do
   target <- [(x, y) | x <- [0..50], y <- [0..50], x + y <= 50]
-  case bfs (1, 1) (neighboursOf part1Input) (== target) of
-    Just (steps, _) -> do
+  case minCost input target of
+    Just steps -> do
       guard $ steps <= 50
       pure target
     Nothing -> []
 
 main = do
-  print part1
-  print part2
+  let input = 1358
+  print (part1 input)
+  print (part2 input)

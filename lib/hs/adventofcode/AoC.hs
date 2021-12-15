@@ -62,7 +62,7 @@ fixpoint :: Eq a => (a -> a) -> a -> a
 fixpoint f a =
   let xs = iterate f a
   in fst . head . filter (uncurry (==)) $ zip (drop 1 xs) xs
-
+{-# INLINABLE fixpoint #-}
 
 iterateN :: Int -> (a -> a) -> a -> a
 iterateN 0 f = id
@@ -128,7 +128,7 @@ instance Num a => Num (V3 a) where
 median :: (Foldable t, Ord a, Fractional a) => t a -> a
 median xs =
   case (length xs `divMod` 2, sort (toList xs)) of
-    (_, []) -> error "median of empty list"
+    (_, [])     -> error "median of empty list"
     ((n, 1), s) -> s !! n
     ((n, _), s) -> sum (take 2 . drop (n - 1) $ s) / 2
 
