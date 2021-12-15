@@ -13,13 +13,14 @@ in { lang ? "hs", nixpkgs ? import ./pkgs.nix, extraDeps ? defaultExtraDeps }:
         };
       };
       pkgs = hpkgs: [
+        hpkgs.MonadRandom
+        hpkgs.aoc
+        hpkgs.cryptonite
+        hpkgs.fingertree
         hpkgs.megaparsec
         hpkgs.split
-        hpkgs.MonadRandom
-        hpkgs.vector
-        hpkgs.aoc
-        hpkgs.fingertree
         hpkgs.unordered-containers
+        hpkgs.vector
       ] ++ (extraDeps.hs hpkgs);
     in [ (haskellPackages.ghcWithPackages pkgs) ];
     asm = with nixpkgs; [ nasm manpages gdb glibc.dev ];

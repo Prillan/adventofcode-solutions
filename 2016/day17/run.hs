@@ -72,12 +72,12 @@ allDone input =
   . takeWhile (not.null)
   $ iterate (>>= neighboursOf input) [("", (0, 0))]
 
-part1 input = do
-  (steps, (path, _)) <- bfs ("", (0, 0)) (neighboursOf input) done
-  pure (steps, reverse path)
+part1 input =
+  let Just (_, (path, _)) = bfs ("", (0, 0)) (neighboursOf input) done
+  in reverse path
 part2 = length . fst . last . allDone
 
 main = do
   let input = "pslxynzg"
-  print (part1 input)
+  putStrLn (part1 input)
   print (part2 input)
