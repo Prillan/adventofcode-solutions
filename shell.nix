@@ -18,6 +18,7 @@ in { lang ? "hs", nixpkgs ? import ./pkgs.nix, extraDeps ? defaultExtraDeps }:
         hpkgs.MonadRandom
         hpkgs.vector
         hpkgs.aoc
+        hpkgs.fingertree
         hpkgs.unordered-containers
       ] ++ (extraDeps.hs hpkgs);
     in [ (haskellPackages.ghcWithPackages pkgs) ];
