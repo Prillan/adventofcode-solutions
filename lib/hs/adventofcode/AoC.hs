@@ -1,7 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveFoldable #-}
-{-# LANGUAGE DeriveTraversable #-}
 module AoC ( tce
            , fixpoint
            , iterateN
@@ -48,6 +44,7 @@ import Control.Applicative (liftA2)
 import Data.Bits (Bits, setBit, testBit)
 import Data.Char (digitToInt)
 import Data.Foldable (toList)
+import Data.Hashable (Hashable)
 import Data.List (maximumBy, minimumBy, sort)
 import Data.Ord (comparing)
 import Data.Map.Strict (Map)
@@ -89,7 +86,8 @@ partitionWith f = go
                  Left l -> (l:ls, rs)
 
 newtype V2 a = V2 (a, a)
-  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+  deriving (Functor, Foldable, Traversable)
+  deriving newtype (Eq, Ord, Show, Hashable)
 
 v2 = V2
 
@@ -119,7 +117,8 @@ extendY' y (V2 (x, z)) = V3 (x, y, z)
 extendZ' z (V2 (x, y)) = V3 (x, y, z)
 
 newtype V3 a = V3 (a, a, a)
-  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+  deriving (Functor, Foldable, Traversable)
+  deriving newtype (Eq, Ord, Show, Hashable)
 
 v3 = V3
 
