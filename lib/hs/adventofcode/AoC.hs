@@ -41,9 +41,9 @@ module AoC ( tce
 
 
 import Control.Applicative (liftA2)
-import Data.Bits (Bits, setBit, testBit)
+import Data.Bits (Bits, setBit, shiftL, testBit)
 import Data.Char (digitToInt)
-import Data.Foldable (toList)
+import Data.Foldable (foldl', toList)
 import Data.Hashable (Hashable)
 import Data.List (maximumBy, minimumBy, sort)
 import Data.Ord (comparing)
@@ -171,9 +171,11 @@ readBinary :: (Num a, Bits a) => String -> a
 readBinary = bitsFromBools . map (== '1')
 
 bitsFromBools :: (Num b, Bits b) => [Bool] -> b
-bitsFromBools = foldl f 0 . zip [0..] . reverse
-  where f acc (i, True) = setBit acc i
-        f acc _ = acc
+bitsFromBools = foldl' f 0
+  where f n = \case
+          True  -> setBit (shiftL n 1) 0
+          False -> shiftL n 1
+{-# INLINABLE bitsFromBools #-}
 
 boolsFromBits n b = reverse $ map (testBit b) [0..n-1]
 
