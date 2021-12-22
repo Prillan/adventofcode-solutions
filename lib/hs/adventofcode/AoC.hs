@@ -6,6 +6,7 @@ module AoC ( tce
            , fixpoint
            , iterateN
            , iterateN'
+           , partitionWith
 
            -- vectors
            , V2(V2)
@@ -76,6 +77,16 @@ iterateN' 0 _ x = x
 iterateN' 1 f !x = f x
 iterateN' n f !x = iterateN' (n - 1) f (f x)
 {-# INLINABLE iterateN' #-}
+
+partitionWith :: (a -> Either b c) -> [a] -> ([b], [c])
+partitionWith f = go
+  where go = \case
+          [] -> ([], [])
+          (x:xs) ->
+            let (ls, rs) = go xs
+            in case f x of
+                 Right r -> (ls, r:rs)
+                 Left l -> (l:ls, rs)
 
 newtype V2 a = V2 (a, a)
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
