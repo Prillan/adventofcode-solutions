@@ -1,0 +1,61 @@
+-- push 0
+
+
+z = w_0 + 16
+
+push z
+
+z = w_1 + 11
+
+push z
+
+z = w_2 + 12
+
+if -5 + z != w_3
+  then z = w_3 + 12
+  else pop z
+
+if -3 + z != w_4
+  then z = w_4 + 12
+  else pop z
+
+if 14 + z != w_5
+  then push z; z = w_5 + 2
+
+if 15 + z != w_6
+  then push z; z = w_6 + 11
+
+if -16 + z != w_7
+  then z = w_7 + 4
+  else pop z
+
+if 14 + z != w_8
+  then push z; z = w_8 + 12
+
+if 15 + z != w_9
+  then push z; z = w_9 + 9
+
+if -7 + z != w_10
+  then z = w_10 + 10
+  else pop z
+
+if -11 + z != w_11
+  then z = w_11 + 11
+  else pop z
+
+if -6 + z != w_12
+  then z = w_12 + 6
+  else pop z
+
+if -11 + z != w_13
+  then z = w_13 + 15
+  else pop z
+
+----- From the back
+
+if -11 + z != w_13
+  then z = w_13 + 15
+  else pop z
+
+z = 0
+=> -11 + z == w_13 (+ stack size = 0)

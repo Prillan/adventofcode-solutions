@@ -1,0 +1,334 @@
+#1
+inp w
+
+x == 0 => 1 if x == 0 else 0 "NOT"
+
+z /= 1       -- div z 1 NOP?
+
+x = 11 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 16)
+
+
+#2
+inp w
+
+x = 0
+add x z
+mod x 26
+div z 1
+add x 12
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 11
+mul y x
+add z y
+
+z /= 1       -- div z 1 NOP?
+
+x = 12 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 11)
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 1
+add x 13
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 12
+mul y x
+add z y
+
+z /= 1       -- div z 1 NOP?
+
+x = 13 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 12)
+
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -5
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 12
+mul y x
+add z y
+
+z /= 26
+
+x = -5 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 12)
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -3
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 12
+mul y x
+add z y
+
+z /= 26
+
+x = -3 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 12)
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 1
+add x 14
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 2
+mul y x
+add z y
+
+z /= 1
+
+x = 14 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 2)
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 1
+add x 15
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 11
+mul y x
+add z y
+
+z /= 1
+
+x = 15 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 11)
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -16
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 4
+mul y x
+add z y
+
+z /= 26
+
+x = -16 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 2)
+
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 1
+add x 14
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 12
+mul y x
+add z y
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 1
+add x 15
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 9
+mul y x
+add z y
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -7
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 10
+mul y x
+add z y
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -11
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 11
+mul y x
+add z y
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -6
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 6
+mul y x
+add z y
+
+inp w
+x = 0
+add x z
+mod x 26
+div z 26
+add x -11
+eql x w
+eql x 0
+y = 0
+add y 25
+mul y x
+add y 1
+mul z y
+y = 0
+add y w
+add y 15
+mul y x
+add z y
+
+z /= 26  -> z = 0 if z < 26 else z = z / 26
+
+x = -11 + (z % 26) != w
+
+z = z * (25 * x + 1) + x * (w + 15)
+
+
+x = 0, 1
+
+-------------
+
+z * (25 * x + 1) + x * (w + 15) = 0
+=> z = 0 AND x = 0
+
+=> 0 <= z' < 26  AND z' == w_14 + 11
+
+x = z'' % 26 != w + 6
+z' = z'' * (25 * x + 1) + x * (w_13 + 6)
+
+(x == 1 => z' = z'' * 26 + w_13 + 6
+              = w_14 + 11
+        => z'' = 0)
+
+(x == 0 => z'' % 26 = w_13 + 6 =>
+        => z' = z'' <=> w_13 + 6 = w_14 + 11
+                    <=> w_13 = w_14 + 5
+
+=> 
+-----------
