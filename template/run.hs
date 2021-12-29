@@ -1,5 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 import AoC
 import AoC.Grid
@@ -21,6 +23,8 @@ import qualified Data.Set as Set
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
 
+type N = Int
+
 parse = id
 
 parseAll = map parse  . lines
@@ -28,9 +32,13 @@ parseAll = map parse  . lines
 part1 = id
 part2 = id
 
+main :: IO ()
 main = main' "input.txt"
+
+exampleMain :: IO ()
 exampleMain = main' "example.txt"
 
+main' :: FilePath -> IO ()
 main' file = do
    input <- parseAll <$> readFile file
    print (part1 input)
