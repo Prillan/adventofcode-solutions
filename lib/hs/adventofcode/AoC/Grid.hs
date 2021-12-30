@@ -28,7 +28,7 @@ parseMapGrid parser =
 toMapGrid :: [[a]] -> HashMap (Int, Int) a
 toMapGrid xs =
   HashMap.fromList [((ci, ri), cell) | (ri, row) <- zip [0..] xs
-                                 , (ci, cell) <- zip [0..] row]
+                                     , (ci, cell) <- zip [0..] row]
 
 ppGrid :: (a -> Char) -> [[a]] -> String
 ppGrid pp = unlines . map (map pp)
