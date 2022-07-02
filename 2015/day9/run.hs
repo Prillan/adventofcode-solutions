@@ -1,26 +1,25 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE FlexibleContexts #-}
-import Data.List (minimumBy, permutations, nub)
-import Data.Maybe
+import Control.Applicative ((<|>))
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap
+import Data.Hashable (Hashable)
+import Data.List (minimumBy, permutations, nub)
+import Data.Maybe
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.String (IsString, fromString)
 import Text.Parsec hiding ((<|>))
 
-import Control.Applicative ((<|>))
-
 newtype City = City String
-  deriving (Show, Read, Eq, IsString, Ord)
+  deriving (Show, Read, Eq, IsString, Ord, Hashable)
 
 type Distance = Integer
-data Path = Path City City Distance
+data Path = Path { start :: City
+                 , stop  :: City
+                 , dist  :: Distance
+                 }
   deriving Show
-
-start (Path c _ _) = c
-stop (Path _ c _) = c
-dist (Path _ _ d) = d
 
 city = fromString <$> many1 (oneOf az)
   where az = ['A'..'Z'] ++ ['a'..'z']
@@ -33,7 +32,7 @@ readPath s = case parse path "" s of
                Right x -> Just x
                Left _ -> Nothing
 
-process = shortestPath . mapMaybe readPath . lines
+parseAll = mapMaybe readPath . lines
 
 type Result = ([City], Distance)
 
@@ -48,6 +47,10 @@ shortestPath paths = minimumBy (\a b -> snd a `compare` snd b)
 remove :: Eq a => a -> [a] -> [a]
 remove x = filter (/= x)
 
+part1 = snd . shortestPath
+part2 = negate . snd . shortestPath . map (\p -> p { dist = negate (dist p) })
+
 main = do
-   input <- readFile "input.txt"
-   print (process input)
+   input <- parseAll <$> readFile "input.txt"
+   print $ part1 input
+   print $ part2 input

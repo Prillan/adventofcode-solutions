@@ -15,6 +15,7 @@
             aoc
             cryptonite
             fingertree
+            hashable
             lens
             megaparsec
             multiset
