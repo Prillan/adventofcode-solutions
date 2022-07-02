@@ -1,4 +1,6 @@
-*hi
-*o
+*.hi
+*.dyn_hi
+*.o
+*.dyn_o
 run
 hard
