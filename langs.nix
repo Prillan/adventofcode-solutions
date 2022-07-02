@@ -34,7 +34,7 @@
     name = "ASM";
     full = false;
     extension = "asm";
-    buildInputs = with pkgs; [ nasm manpages gdb glibc.dev ];
+    buildInputs = with pkgs; [ nasm man-pages gdb glibc.dev ];
     buildPhase = ''
       nasm -felf64 run.asm && ld -o run run.o
     '';
