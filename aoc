@@ -34,31 +34,13 @@ day () {
         *) usage ;;
     esac
 
-    extra_arg=()
-    if [ -e "./extra.nix" ]; then
-        extra_arg=("--arg" "extraDeps" "import ./extra.nix")
-    fi
-
-    exec nix-shell \
-         ../../shell.nix \
-         --argstr lang "$AOC_LANG" \
-         --run "$SHELL" \
-         "${extra_arg[@]}"
-    exit 0
-}
-
-testAll () {
-    if ! [ -z "$1" ]; then
-        AOC_YEAR="$1"
-    fi
-    nix-shell --run "./test-runner $AOC_YEAR"
+    exec nix develop ".#langs.${AOC_LANG}"
 }
 
 while true; do
     case $1 in
         -l) shift; AOC_LANG="$1"; shift;;
         +([0-9])) day $1 $2;;
-        test-all) testAll $2;;
         *) usage;;
     esac
 done

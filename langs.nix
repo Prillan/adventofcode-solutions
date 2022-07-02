@@ -1,31 +1,34 @@
-{ pkgs ? import ./pkgs.nix }: {
+{ pkgs }: {
   hs = {
     name = "Haskell";
     full = true;
     extension = "hs";
-    buildInputs = let
-      inherit (pkgs) haskellPackages;
-      aoc = haskellPackages.callPackage ./lib/hs/adventofcode/pkg.nix { };
-      ghcPkgs = hpkgs:
-        with hpkgs; [
-          MonadRandom
+    buildInputs =
+      let
+        inherit (pkgs) haskellPackages;
+        aoc = haskellPackages.callPackage ./lib/hs/adventofcode/pkg.nix { };
+        ghcPkgs = hpkgs:
+          with hpkgs; [
+            MonadRandom
 
-          aeson
-          aoc
-          cryptonite
-          fingertree
-          lens
-          megaparsec
-          multiset
-          pipes
-          split
-          unordered-containers
-          vector
-        ];
-    in [ (haskellPackages.ghcWithPackages ghcPkgs) ];
+            aeson
+            aoc
+            cryptonite
+            fingertree
+            lens
+            megaparsec
+            multiset
+            pipes
+            split
+            unordered-containers
+            vector
+          ];
+      in
+      [ (haskellPackages.ghcWithPackages ghcPkgs) ];
     buildPhase = ''
       ghc -O2 run.hs
     '';
+    shellRunHelp = "ghc -O2 run.hs && time ./run";
   };
   asm = rec {
     name = "ASM";
@@ -35,20 +38,23 @@
     buildPhase = ''
       nasm -felf64 run.asm && ld -o run run.o
     '';
+    shellRunHelp = "nasm -felf64 run.asm && ld -o run run.o && time ./run < input.txt";
   };
-  nix = rec {
-    name = "Nix";
-    full = false;
-    extension = "nix";
-    buildInputs = [ pkgs.makeWrapper ];
-    buildPhase =
-      let runner = pkgs.callPackage ./lib/nix/pkg.nix {};
-      in ''
+  nix =
+    let runner = pkgs.callPackage ./lib/nix/pkg.nix { };
+    in
+    rec {
+      name = "Nix";
+      full = false;
+      extension = "nix";
+      buildInputs = [ pkgs.makeWrapper runner ];
+      buildPhase = ''
         mkdir -p $out/share/
         cp $src/{run.nix,input.txt} $out/share/
 
         makeWrapper ${runner}/bin/nix-eval run \
           --set TARGET $out/share/run.nix
       '';
-  };
+      shellRunHelp = "time nix-eval ./run.nix";
+    };
 }

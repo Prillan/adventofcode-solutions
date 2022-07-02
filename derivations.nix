@@ -1,4 +1,4 @@
-{ pkgs ? import ./pkgs.nix }:
+{ pkgs }:
 let
   days = import ./days.nix;
   matches = regex: str: builtins.match regex str != null;
@@ -17,16 +17,18 @@ let
     in
     pkgs.stdenv.mkDerivation {
       name = "aoc-${name}-year${toString y}-day${toString d}";
-      src = builtins.filterSource (path: type:
-        (matches ".*.${extension}" path) || (matches ".*.txt" path))
+      src = builtins.filterSource
+        (path: type:
+          (matches ".*.${extension}" path) || (matches ".*.txt" path))
         (dayPath y d);
       buildInputs = buildInputs ++ [ pkgs.jq ];
       challengeMeta = builtins.toJSON challengeMeta;
       passAsFile = [ "challengeMeta" ];
-      buildPhase = if builtins.pathExists (dayLangSkipPath y d lang) then
-        "touch skip"
-      else
-        buildPhase;
+      buildPhase =
+        if builtins.pathExists (dayLangSkipPath y d lang) then
+          "touch skip"
+        else
+          buildPhase;
       installPhase = ''
         mkdir -p $out
         if ! [ -e skip ]; then
@@ -65,18 +67,25 @@ let
     let hasCodeFor = lang: builtins.pathExists (dayLangPath y d lang);
     in builtins.filter hasCodeFor (builtins.attrValues langs);
   dayDrvs = y: d:
-    builtins.listToAttrs (map (lang: {
-      name = lang.extension;
-      value = drv y d lang;
-    }) (dayLangs y d));
-  drvs = builtins.listToAttrs (map (y: {
-    name = "year${y}";
-    value = builtins.listToAttrs (map (d: {
-      name = "day${toString d}";
-      value = dayDrvs y d;
-    }) days.${y});
-  }) (builtins.attrNames days));
+    builtins.listToAttrs (map
+      (lang: {
+        name = lang.extension;
+        value = drv y d lang;
+      })
+      (dayLangs y d));
+  drvs = builtins.listToAttrs (map
+    (y: {
+      name = "year${y}";
+      value = builtins.listToAttrs (map
+        (d: {
+          name = "day${toString d}";
+          value = dayDrvs y d;
+        })
+        days.${y});
+    })
+    (builtins.attrNames days));
   flat = with builtins;
     let flatten1 = xs: concatLists (map attrValues xs);
     in flatten1 (flatten1 (attrValues drvs));
-in drvs // { all = flat; }
+in
+drvs // { all = flat; }

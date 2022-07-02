@@ -15,8 +15,12 @@ let
         (attrNames (readDir (./. + "/${year}")));
       matched = filter (x: x != null) ms;
       ds = map (x: toInt (head x)) matched;
-    in sort lessThan ds;
-in listToAttrs (map (y: {
+    in
+    sort lessThan ds;
+in
+listToAttrs (map
+  (y: {
     name = y;
     value = days y;
-  }) years)
+  })
+  years)
