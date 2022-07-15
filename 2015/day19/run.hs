@@ -1,83 +1,78 @@
 {-# LANGUAGE BangPatterns #-}
-import           Data.Aeson
-import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy, isPrefixOf, sortBy)
-import           Data.Maybe (mapMaybe)
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+import Control.Monad (guard)
+import Data.List (inits, tails)
+import Data.String (IsString)
 import qualified Data.Set as Set
-import           Data.Vector ((!), (!?))
-import qualified Data.Vector as V
-import Debug.Trace (trace)
-import           Text.Parsec
+import Data.Void (Void)
+import Text.Megaparsec
+import Text.Megaparsec.Char
 
---newtype Atom = Atom String deriving (Show, Eq)
-newtype Molecule = Molecule String deriving (Show, Eq)
+type Parser = Parsec Void String
 
-data Rule = Rule !Molecule !Molecule deriving Show
+newtype Atom = Atom String
+  deriving (Show, Eq, Ord, IsString)
 
+newtype Molecule = Molecule { atoms :: [Atom] }
+  deriving (Show, Eq, Ord)
+
+data Rule = Rule !Atom !Molecule deriving Show
+
+azl :: [Char]
 azl = ['a'..'z']
+
+azu :: [Char]
 azu = ['A'..'Z']
 
---atom = Atom <$> ((:) <$> oneOf ('e':azu) <*> many (oneOf azl))
-molecule = Molecule <$> many1 (oneOf $ azl ++ azu)
-rule = Rule <$> molecule <*> (string " => " *> molecule)
+atom :: Parser Atom
+atom = Atom <$> ((:) <$> oneOf azu <*> many (oneOf azl))
+
+molecule :: Parser Molecule
+molecule = Molecule <$> many atom
+
+eAtom :: Parser Atom
+eAtom = Atom <$> string "e"
+
+rule :: Parser Rule
+rule = Rule <$> (atom <|> eAtom) <*> (string " => " *> molecule)
 
 unsafeRight (Right x) = x
 
-parseAll input = ( map unsafeRight . map (parse rule "") $ r
-                 , filter (`elem` (azl++azu)) $ l)
+parseAll :: String -> ([Rule], Molecule)
+parseAll input = ( unsafeRight . traverse (parse rule "") $ r
+                 , unsafeRight (parse molecule "" l)
+                 )
   where l = last . lines $ input
-        r = init . filter ((>= 1) . length) . lines $ input
+        r = init . filter (not . null) . lines $ input
 
+foci :: [a] -> [([a], a, [a])]
+foci [] = []
+foci xs =
+  map (\case (ys, z:zs) -> (ys, z, zs))
+  . init
+  $ zip (inits xs) (tails xs)
 
-replace :: String -> String -> String -> [String]
-replace f t v = replace' [] v
-  where replace' _ [] = []
-        replace' l r@(rh:rs)
-          | f `isPrefixOf` r = ((reverse l) ++ t ++ (drop (length f) r)) : replace' (rh:l) rs
-          | otherwise = replace' (rh:l) rs
+step :: [Rule] -> Molecule -> Set.Set Molecule
+step rules input = Set.fromList do
+  Rule a (Molecule replacement) <- rules
+  (h, e, t) <- foci (atoms input)
+  guard $ a == e
+  pure $ Molecule $ h ++ replacement ++ t
 
-replaceFirst :: String -> String -> String -> Maybe String
-replaceFirst f t v = replace' [] v
-  where replace' _ [] = Nothing
-        replace' l r@(rh:rs)
-          | f `isPrefixOf` r = Just ((reverse l) ++ t ++ (drop (length f) r))
-          | otherwise = replace' (rh:l) rs
+part1 :: [Rule] -> Molecule -> Int
+part1 rules = length . step rules
 
-applyMany input (Rule (Molecule from) (Molecule to)) = replace from to input
-step :: [Rule] -> String -> Set.Set String
-step rules input = Set.fromList $ concatMap (applyMany input) rules
-
-reverseRule (Rule m1 m2) = Rule m2 m1
-noE (Rule (Molecule m1) _) = m1 /= "e"
-bigTo (Rule _ (Molecule m1)) (Rule _ (Molecule m2)) = length m2 `compare` length m1
-
-part1 rules input = step rules input
-part2 rules input = filter (\(i, s) -> trace (show i) $ Set.member input s) values
-  where step' :: Set.Set String -> Set.Set String
-        step' = Set.unions . map (Set.filter ((<= l) . length) . step rules) . Set.toList
-        values = zip [0..] $ iterate step' (Set.fromList ["e"])
-        l = length input
-
-part2' rules input =
-  filter (\(i, (s)) -> trace (show i) $ not . Set.null $ Set.intersection s targets) values
-  where targets = Set.fromList ["HF", "Nal", "OMg"]
-        rules' = map reverseRule . filter noE . sortBy bigTo $ rules
-        step' :: (Set.Set String) -> (Set.Set String)
-        step' (toCheck) = (new)
-          where new = (
-                 Set.unions
-                 . map (step rules')
-                 . Set.toList $ toCheck)
-        values = zip [0..] $ iterate step' (Set.fromList [input])
-
-
-part2'' rules input = takeWhile (/= "e") $ iterate reduce input
-  where reduce v = head $ mapMaybe (\(Rule (Molecule f) (Molecule t)) -> replaceFirst f t v) reversed
-        reversed = map reverseRule $ rules
-        
+part2 :: Molecule -> Int
+part2 (Molecule input) = symbols - lefts - rights - (2*ys) - 1
+  where symbols = length input
+        lefts = length $ filter (== "Rn") input
+        rights = length $ filter (== "Ar") input
+        ys = length $ filter (== "Y") input
 
 main = do
    (rules, input) <- parseAll <$> readFile "input.txt"
-   -- mapM_ print rules
-   -- print input
-   print (length $ part1 rules input)
-   mapM_ print (part2'' rules input)
+   print (part1 rules input)
+   print (part2 input)
