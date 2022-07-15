@@ -1,60 +1,81 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TupleSections #-}
-import Control.Applicative
 
-import Data.List (permutations, minimumBy, maximumBy, maximum)
-import Data.Maybe (fromJust)
+import Data.Void (Void)
+import Data.List (permutations)
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap
-import Text.Parsec hiding ((<|>))
+import Text.Megaparsec
+import Text.Megaparsec.Char
+
+type Parser = Parsec Void String
 
 type Person = String
-persons = ["Alice", "Bob", "Carol", "David"
-          , "Eric", "Frank", "George", "Mallory"]
-data Pairing = P Person Person Integer
+
+people :: [Person]
+people = [ "Alice"
+         , "Bob"
+         , "Carol"
+         , "David"
+         , "Eric"
+         , "Frank"
+         , "George"
+         , "Mallory"
+         ]
+
+data Pairing = P Person Person Int
   deriving Show
+
+toTuple :: Pairing -> ((Person, Person), Int)
 toTuple (P p1 p2 i) = ((p1, p2), i)
 
-data Arrangement = A [Person] Integer
-  deriving (Show, Eq)
-instance Ord Arrangement where
-  compare (A _ x) (A _ y) = compare x y
+type Settings = HashMap (Person, Person) Int
 
-type Settings = HashMap (Person, Person) Integer
+person :: Parser String
+person = choice $ map (try.string) people
 
-person :: Stream s m Char => ParsecT s u m String
-person = choice $ map (try.string) persons
-
-sign :: Stream s m Char => ParsecT s u m Integer
+sign :: Parser Int
 sign = (\x -> if x == "gain" then 1 else -1) <$> choice [string "gain", string "lose"]
 
-pairing :: Stream s m Char => ParsecT s u m Pairing
+pairing :: Parser Pairing
 pairing = do
  p1 <- person
  _ <- string " would "
  s <- sign
  _ <- space
- v <- read <$> many1 digit
+ v <- read <$> many digitChar
  _ <- string " happiness units by sitting next to "
  p2 <- person
  pure (P p1 p2 (s*v))
 
-readPairing :: String -> Either ParseError Pairing
-readPairing = parse pairing ""
 
-unsafeLookup m (p1, p2) = fromJust $ HashMap.lookup (p1, p2) m <|> HashMap.lookup (p2, p1) m
-happiness m (p1, p2) = fromJust $ (+) <$> lkp (p1, p2) <*> lkp (p2, p1)
-  where lkp (p1, p2) = HashMap.lookup (p1, p2) m
+parseAll :: String -> [Pairing]
+parseAll = unsafeRight . traverse (parse pairing "") . lines
+
+-- slightly inefficient
+happiness :: Settings -> (Person, Person) -> Int
+happiness m (p1, p2) = lkp (p1, p2) + lkp (p2, p1)
+  where lkp ps = HashMap.lookupDefault 0 ps m
 
 unsafeRight (Right x) = x
 
-process input = optimal
-  where setting = HashMap.fromList . map (toTuple . unsafeRight . readPairing) . lines $ input
-        arrangements = map (head (persons):) (permutations (drop 1 persons))
-        value xs = sum . map (happiness setting) $ zip xs (drop 1 xs ++ [head xs])
-        toArrangement xs = A xs (value xs)
-        optimal = maximum . map toArrangement $ arrangements
+process :: [String] -> [Pairing] -> Int
+process (anchor:rest) input = maximum
+                              . map value
+                              $ map (anchor:) (permutations rest)
+  where settings = HashMap.fromList . map toTuple $ input
+        value xs = sum
+                   . map (happiness settings)
+                   $ zip xs (drop 1 xs ++ take 1 xs)
+
+part1 :: [Pairing] -> Int
+part1 = process people
+
+part2 :: [Pairing] -> Int
+part2 = process ("Me":people)
 
 main = do
-   input <- readFile "input.txt"
-   print (process input)
+   input <- parseAll <$> readFile "input.txt"
+   print $ part1 input
+   print $ part2 input
