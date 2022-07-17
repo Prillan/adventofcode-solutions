@@ -4,3 +4,4 @@
 *.dyn_o
 run
 hard
+.koka

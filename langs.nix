@@ -45,6 +45,20 @@
     '';
     shellRunHelp = "nasm -felf64 run.asm && ld -o run run.o && time ./run < input.txt";
   };
+  koka = {
+    name = "Koka";
+    slug = "koka";
+    url = "https://koka-lang.github.io/koka/doc/index.html";
+    full = false;
+    extension = "kk";
+    buildInputs = [ pkgs.koka ];
+    # TODO: Add some support for sharing the compilation result of the
+    # stdlib, otherwise we recompile it for every single derivation.
+    buildPhase = ''
+      koka -o run run.kk && chmod +x ./run
+    '';
+    shellRunHelp = "koka -o run run.kk && time ./run";
+  };
   nix =
     let runner = pkgs.callPackage ./lib/nix/pkg.nix { };
     in
