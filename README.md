@@ -8,6 +8,7 @@ solutions are noted below.
 |------|------|------|------|------|------|------|------|
 | [ASM](#asm) |  |  |  |  |  | 2/25 |  |
 | [Haskell](#haskell) | 24/25 | ✓ | 23/25 | 11/25 | 9/25 | ✓ | ✓ |
+| [Koka](#koka) |  |  |  |  |  |  | 1/25 |
 | [Nix](#nix) |  |  |  |  |  |  | 1/25 |
 
 ## Running the Code
@@ -69,6 +70,10 @@ Solved:
 | 23 | [✓](./2015/day23/run.hs) | [✓](./2016/day23/run.hs) |  |  |  | [✓](./2020/day23/run.hs) | [✓](./2021/day23/run.hs) |
 | 24 | [✓](./2015/day24/run.hs) | [✓](./2016/day24/run.hs) | [✓](./2017/day24/run.hs) |  |  | [✓](./2020/day24/run.hs) | [✓](./2021/day24/run.hs) |
 | 25 | [✓](./2015/day25/run.hs) | [✓](./2016/day25/run.hs) | [✓](./2017/day25/run.hs) |  |  | [✓](./2020/day25/run.hs) | [✓](./2021/day25/run.hs) |
+
+## Koka
+Solved:
+ - [2021, day 1](./2021/day1/run.kk)
 
 ## Nix
 Solved:
