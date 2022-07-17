@@ -20,19 +20,14 @@ day () {
     fi
     DAY="$1"
     echo "Setting up day ${DAY} (${AOC_YEAR}, ${AOC_LANG})";
+    LANG_EXT="$(nix eval --raw .#lib.x86_64-linux.langs.${AOC_LANG}.extension)"
     mkdir -p "${AOC_YEAR}/day${DAY}"
-    if ! [ -e "${AOC_YEAR}/day${DAY}/run.${AOC_LANG}" ]; then
-        cp "template/run.${AOC_LANG}" "${AOC_YEAR}/day${DAY}/"
+    if ! [ -e "${AOC_YEAR}/day${DAY}/run.${LANG_EXT}" ]; then
+        if [ -e "template/run.${LANG_EXT}" ]; then
+            cp "template/run.${LANG_EXT}" "${AOC_YEAR}/day${DAY}/"
+        fi;
     fi
     cd "${AOC_YEAR}/day${DAY}"
-
-    echo "Compile/run with:"
-    case $AOC_LANG in
-        asm) echo "  nasm -felf64 run.asm && ld -o run run.o && time ./run < input.txt" ;;
-        hs) echo "  ghc -O2 run.hs && time ./run" ;;
-        nix) echo "  time nix-eval ./run.nix" ;;
-        *) usage ;;
-    esac
 
     exec nix develop ".#langs.${AOC_LANG}"
 }

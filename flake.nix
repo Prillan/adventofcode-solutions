@@ -23,8 +23,11 @@
             program = "${copyReadme}/bin/copy-readme";
           };
         };
+        lib = {
+          inherit langs;
+        };
         devShells =
-          let langShell = lang: { name, buildInputs, shellRunHelp, ... }: pkgs.mkShell {
+          let langShell = lang: { name, buildInputs, shellRunHelp, extension, ... }: pkgs.mkShell {
             inherit buildInputs;
             shellHook = ''
               echo '------------------------'
