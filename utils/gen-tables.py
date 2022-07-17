@@ -13,7 +13,10 @@ days_by_lang = defaultdict(
 )
 
 with Path(sys.argv[1]).open() as f:
-    langs = json.load(f)
+    langs = {
+        l['slug']: l
+        for l in json.load(f)
+    }
 
 template = Path(sys.argv[2]).read_text()
 
@@ -23,8 +26,8 @@ for drv in map(Path, sys.argv[3:]):
 
     y = meta['year']
     d = meta['day']
-    l = meta['lang']['extension']
-        
+    l = meta['lang']['slug']
+
     days[y][d][l] = meta['status']
     days_by_lang[l][y][d] = meta['status']
 
@@ -42,18 +45,18 @@ def table(header, rows):
         row(['------'] * len(header)).replace(' ', ''),
         *map(row, rows)
     ])
-    
+
 def completion_table():
     def lang_cell(l):
         name = l['name']
-        anchor = slug(l['name'])
+        anchor = l['slug']
         return f"[{name}](#{anchor})"
 
     def cell(y, l):
         completed = sum(
             1
             for d in range(1, 26)
-            if days_by_lang[l['extension']][y].get(d, '') == 'G'
+            if days_by_lang[l['slug']][y].get(d, '') == 'G'
         )
         if completed == 25:
             return '✓'
@@ -77,26 +80,28 @@ def lang_table(l):
         return lang_table_simple(l)
 
 def lang_table_simple(l):
+    ext = langs[l]['extension']
     return '\n'.join(['Solved:'] + [
-        f" - [{y}, day {d}](./{y}/day{d}/run.{l})"
+        f" - [{y}, day {d}](./{y}/day{d}/run.{ext})"
         for y in years
         for d in range(1, 26)
         if days[y][d].get(l, '?') == 'G'
     ])
 
 def lang_table_full(l):
+    ext = langs[l]['extension']
     def row(d):
         return [d] + [cell(d, y) for y in years]
 
     def cell(d, y):
         status = days[y][d].get(l, '?')
         if status == 'G':
-            return f'[✓](./{y}/day{d}/run.{l})'
+            return f'[✓](./{y}/day{d}/run.{ext})'
         elif status == '?':
             return ''
         elif status == 'B':
             return '❌'
-        
+
     return table(
         [r"Day \\ Year"] + years,
         map(row, range(1, 26))

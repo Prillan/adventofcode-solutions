@@ -4,9 +4,9 @@ let
   drvs = import ./derivations.nix { inherit pkgs; };
   langs = import ./langs.nix { inherit pkgs; };
   langDrv =
-    let f = ext: lang: { inherit (lang) name extension full; };
+    let f = lang: { inherit (lang) name slug extension full; };
     in
-    pkgs.writeText "langs.json" (toJSON (mapAttrs f langs));
+    pkgs.writeText "langs.json" (toJSON (map f (attrValues langs)));
 in
 pkgs.runCommand "readme"
 {

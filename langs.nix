@@ -1,6 +1,8 @@
 { pkgs }: {
   hs = {
     name = "Haskell";
+    slug = "haskell";
+    url = "https://www.haskell.org/";
     full = true;
     extension = "hs";
     buildInputs =
@@ -33,6 +35,8 @@
   };
   asm = rec {
     name = "ASM";
+    slug = "asm";
+    url = "https://en.wikipedia.org/wiki/X86_assembly_language";
     full = false;
     extension = "asm";
     buildInputs = with pkgs; [ nasm man-pages gdb glibc.dev ];
@@ -46,6 +50,8 @@
     in
     rec {
       name = "Nix";
+      slug = "nix";
+      url = "https://nixos.org/";
       full = false;
       extension = "nix";
       buildInputs = [ pkgs.makeWrapper runner ];

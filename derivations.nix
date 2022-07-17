@@ -6,12 +6,12 @@ let
   langs = import ./langs.nix { inherit pkgs; };
   drv = y: d: lang:
     let
-      inherit (lang) name extension buildInputs buildPhase;
+      inherit (lang) name slug extension buildInputs buildPhase;
       challengeMeta = {
         year = builtins.fromJSON y;
         day = d;
         lang = {
-          inherit name extension;
+          inherit name extension slug;
         };
       };
     in
