@@ -8,7 +8,7 @@ solutions are noted below.
 |------|------|------|------|------|------|------|------|
 | [ASM](#asm) |  |  |  |  |  | 2/25 |  |
 | [Haskell](#haskell) | 24/25 | ✓ | 23/25 | 11/25 | 9/25 | ✓ | ✓ |
-| [Koka](#koka) |  |  |  |  |  |  | 1/25 |
+| [Koka](#koka) |  |  |  |  |  |  | 2/25 |
 | [Nix](#nix) |  |  |  |  |  |  | 1/25 |
 
 ## Running the Code
@@ -74,6 +74,7 @@ Solved:
 ## Koka
 Solved:
  - [2021, day 1](./2021/day1/run.kk)
+ - [2021, day 2](./2021/day2/run.kk)
 
 ## Nix
 Solved:
