@@ -1,0 +1,40 @@
+set -e
+set +u
+shopt -s extglob
+
+AOC_YEAR=2022
+AOC_LANG=hs
+
+usage () {
+    echo 'usage: ./aoc [-l LANG]  <DAY> [YEAR]' >&2
+    echo '           | test-all [YEAR]' >&2
+    echo ' -l LANG -- language to use, default hs' >&2
+    echo '            choices: hs, asm, nix' >&2
+    exit 1
+}
+
+day () {
+    if [ -n "$2" ]; then
+        AOC_YEAR="$2"
+    fi
+    DAY="$1"
+    echo "Setting up day ${DAY} (${AOC_YEAR}, ${AOC_LANG})";
+    LANG_EXT="$(nix eval --raw .#lib.x86_64-linux.langs.${AOC_LANG}.extension)"
+    mkdir -p "${AOC_YEAR}/day${DAY}"
+    if ! [ -e "${AOC_YEAR}/day${DAY}/run.${LANG_EXT}" ]; then
+        if [ -e "template/run.${LANG_EXT}" ]; then
+            cp "template/run.${LANG_EXT}" "${AOC_YEAR}/day${DAY}/"
+        fi;
+    fi
+    cd "${AOC_YEAR}/day${DAY}"
+
+    exec nix develop ".#langs.${AOC_LANG}"
+}
+
+while true; do
+    case "$1" in
+        -l) shift; AOC_LANG="$1"; shift;;
+        +([0-9])) day "$1" "$2";;
+        *) usage;;
+    esac
+done

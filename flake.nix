@@ -15,9 +15,15 @@
         '';
         derivations = import ./derivations.nix { inherit pkgs; };
         langs = import ./langs.nix { inherit pkgs; };
+
+        aoc = pkgs.callPackage ./utils/aoc/aoc.nix {};
       in
       {
         apps = {
+          aoc = {
+            type = "app";
+            program = "${aoc}/bin/aoc";
+          };
           readme = {
             type = "app";
             program = "${copyReadme}/bin/copy-readme";
