@@ -58,7 +58,7 @@ writeResultWrite:
         mov       rax, 1                  ; system call for write
         mov       rdi, 1                  ; file handle 1 is stdout
         lea       rsi, [rsp+rbx+1]        ; address of string to output
-        mov       rdx, MAX_DIGITS + 1     ; number of bytes
+        mov       rdx, MAX_DIGITS         ; number of bytes
         sub       rdx, rbx
         syscall                           ; invoke operating system to do the write
         add       rsp, MAX_DIGITS + 1
