@@ -55,19 +55,16 @@ top3:   mov pos, rax
         xor elf1, elf1
         xor elf2, elf2
         xor elf3, elf3
-        xor rsi, rsi
 top3_new_elf:
         xor elf, elf
 top3_new_snack:
         xor snack, snack
+        xor rsi, rsi
 top3_snack_loop:
         mov sil, BYTE [ pos ]
         add pos, 1
-        cmp si, 0x0a
-        je  top3_finalize_snack
-        cmp si, 0
-        je  top3_finalize_snack
-        sub si, '0'
+        sub si, '0'             ; convert from ascii
+        jl  top3_finalize_snack ; si = '\0' or '\n'
         imul snack, 10
         add snack, rsi
         jmp top3_snack_loop
