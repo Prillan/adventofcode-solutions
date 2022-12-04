@@ -32,6 +32,9 @@
         lib = {
           inherit langs;
         };
+        packages = {
+          aoc = aoc;
+        };
         devShells =
           let langShell = lang: { name, buildInputs, shellRunHelp, extension, ... }: pkgs.mkShell {
             inherit buildInputs;

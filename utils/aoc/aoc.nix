@@ -1,6 +1,6 @@
-{ writeShellApplication, bash, nixStable }:
-writeShellApplication {
+{ python310, bash, nixStable }:
+python310.pkgs.buildPythonApplication {
   name = "aoc";
-  runtimeInputs = [ bash nixStable ];
-  text = builtins.readFile ./aoc;
+  propagatedBuildInputs = [ bash nixStable ] ++ (with python310.pkgs; [ requests ]);
+  src = ./aoc-py;
 }
