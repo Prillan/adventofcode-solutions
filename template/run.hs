@@ -9,6 +9,7 @@ import AoC.Grid
 import Data.Bifunctor
 import Data.Foldable
 import Data.List
+import Data.List.Split
 import Data.Maybe
 import Data.Ord
 
@@ -30,7 +31,7 @@ parse = id
 parseAll = map parse  . lines
 
 part1 = id
-part2 = id
+part2 = const ()
 
 main :: IO ()
 main = main' "input.txt"
