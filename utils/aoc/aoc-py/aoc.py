@@ -1,5 +1,6 @@
 import argparse
-from datetime import datetime, timedelta
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass
 import json
 import requests
@@ -8,6 +9,7 @@ from pathlib import Path
 import subprocess
 from typing import Optional
 import sys
+import zoneinfo
 
 
 class Missing:
@@ -100,6 +102,17 @@ class Client:
     def input(self, year, day) -> str:
         return self.session.get(f"https://adventofcode.com/{year}/day/{day}/input").text
 
+    def leaderboard(self, year, id) -> dict:
+        return self.session.get(
+            f"https://adventofcode.com/{year}/leaderboard/private/view/{id}.json"
+        ).json()
+
+    @classmethod
+    def from_config(cls, config: Config) -> "Client":
+        if config.token_age >= timedelta(days=30):
+            print("WARN: Old token, requests might fail", file=sys.stderr)
+        return cls(config.token)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -120,6 +133,9 @@ def main():
     config_parser = subparsers.add_parser("config")
     config_parser.add_argument("--token", type=str, default=missing)
 
+    leaderboard_parser = subparsers.add_parser("leaderboard")
+    leaderboard_parser.add_argument("id", type=int)
+
     args = parser.parse_args()
 
     if args.command == "shell":
@@ -130,13 +146,12 @@ def main():
         )
     elif args.command == "config":
         set_config(actions=args)
+    elif args.command in ("leaderboard", "lb"):
+        leaderboard(leaderboard_id=args.id)
 
 
 def exec_shell(language: str, day: int, year: int):
-    config = load_config()
-    if config.token_age >= timedelta(days=30):
-        print("WARN: Old token, requests might fail", file=sys.stderr)
-    client = Client(config.token)
+    client = Client.from_config(load_config())
 
     print(f"Setting up day {day} ({year}, {language})")
     extension = subprocess.run(
@@ -173,6 +188,100 @@ def set_config(actions):
         c.token_added_at = datetime.now()
 
     write_config(c)
+
+
+def age(p: Path) -> timedelta:
+    return datetime.now() - datetime.fromtimestamp(p.stat().st_mtime)
+
+
+def leaderboard(leaderboard_id: int):
+    cache_dir = Path("~/.cache/aoc/").expanduser()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    cache_file = cache_dir / f"{leaderboard_id}.json"
+    if not cache_file.exists() or age(cache_file) >= timedelta(minutes=15):
+        client = Client.from_config(load_config())
+        lbdata = client.leaderboard(2022, leaderboard_id)
+        with cache_file.open("w") as f:
+            json.dump(lbdata, f)
+    else:
+        with cache_file.open() as f:
+            lbdata = json.load(f)
+
+    year = int(lbdata["event"])
+
+    def day_start(day: int):
+        return datetime(year, 12, day, 0, 0, 0, tzinfo=zoneinfo.ZoneInfo("EST"))
+
+    def solve_time(day, ts: int) -> timedelta:
+        return datetime.fromtimestamp(ts, tz=timezone.utc) - day_start(day)
+
+    days = defaultdict(list)
+    times = defaultdict(list)
+    longest_name = 0
+    for id, data in lbdata["members"].items():
+        name = data["name"]
+        if name is None:
+            name = f"Anon #{id}"
+        longest_name = max(longest_name, len(name))
+        for day, parts in data["completion_day_level"].items():
+            for part, pdata in parts.items():
+                if part == "2":
+                    t = solve_time(int(day), pdata["get_star_ts"])
+                    days[day].append((solve_time(int(day), pdata["get_star_ts"]), name))
+                    times[name].append(t)
+
+    def truncate(d: timedelta) -> timedelta:
+        return timedelta(seconds=round(d.total_seconds()))
+
+    averages = [
+        (truncate(sum(times_, start=timedelta(0)) / len(times_)), name)
+        for name, times_ in times.items()
+        if len(times_) == len(days)
+    ]
+    averages.sort()
+
+    fastest = sorted(
+        (
+            time,
+            day,
+            name,
+        )
+        for day, solvers in days.items()
+        for time, name in solvers
+    )
+
+    n = 10
+    for day, solvers in sorted(days.items()):
+        solvers.sort()
+        print(f"-- DAY {day} TOP {n} --")
+        for i, (time, name) in enumerate(solvers[:n], start=1):
+            print(f"{i:>4}. {name:<{longest_name}} {time}")
+
+    print(f"--- AVG. FASTEST ({len(days)} days) ---")
+    for i, (time, name) in enumerate(averages[:n], start=1):
+        print(f"{i:>4}. {name:<{longest_name}} {time}")
+
+    cutoff = 10
+
+    def key(solvers):
+        if len(solvers) >= cutoff:
+            t, _ = solvers[cutoff - 1]
+            return t
+        else:
+            return timedelta(0)
+
+    print(f"--- TOP {n} FASTEST SOLVES ---")
+    for i, (time, day, name) in enumerate(fastest[:n], start=1):
+        print(f"{i:>4}. {str(time):>8}  {name:<{longest_name}} (day {day})")
+
+    hardest_days = sorted(days.items(), key=lambda t: key(t[1]), reverse=True)
+    print(f"--- HARDEST DAYS (Time to top {cutoff}) ---")
+    for i, (day, solvers) in enumerate(hardest_days[:5], start=1):
+        if len(solvers) < cutoff:
+            continue
+        t, _ = solvers[cutoff]
+        print(f"{i:>3}. Day {day}  {t}")
 
 
 if __name__ == "__main__":
