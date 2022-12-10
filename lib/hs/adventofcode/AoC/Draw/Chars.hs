@@ -12,6 +12,7 @@ readLetters =
   . transpose
   . map (chunksOf 5)
   . lines
+  . map normalizeChar
 
 letters =
   let m = [ ('C', lc)
@@ -30,6 +31,12 @@ letters =
   in ( HashMap.fromList m
      , HashMap.fromList (map (\(x, y) -> (y, x)) m)
      )
+
+normalizeChar :: Char -> Char
+normalizeChar = \case
+  '#' -> 'X'
+  '.' -> ' '
+  c   -> c -- "\nX "
 
 readLetter :: [String] -> Either String Char
 readLetter block =
