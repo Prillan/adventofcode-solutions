@@ -67,12 +67,9 @@ part2 g =
            . HashMap.insert start 'a'
            . HashMap.insert end 'z'
            $ g
-      neighbors (pos, elev) = filter (validElev elev . snd) $ hvNeighbors g' pos
+      neighbors (pos, elev) = filter (flip validElev elev . snd) $ hvNeighbors g' pos
   in
-    minimum
-    . mapMaybe (bfs_ ((== end) . fst) neighbors)
-    . filter (\(_, elev) -> elev == ord 'a')
-    $ HashMap.toList g'
+    fromJust $ bfs_ ((== ord 'a') . snd) neighbors (end, ord 'z')
 
 
 main :: IO ()
