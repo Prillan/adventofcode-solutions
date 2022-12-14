@@ -2,7 +2,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TupleSections #-}
-import AoC.Grid
+import AoC.Grid (readGrid)
 
 import Data.List (tails, transpose, union)
 
@@ -59,11 +59,13 @@ allVisible grid =
 scores :: [[Int]] -> HashMap (Int, Int) Int
 scores grid =
   let rows =
-        concat [map (\(ci, cnt) -> ((ri, ci), cnt)) (zip [0..] (visibleH' r))
-               | (ri, r) <- zip [0..] grid ]
+        [((ri, ci), cnt)
+        | (ri, r)   <- zip [0..] grid
+        , (ci, cnt) <- zip [0..] (visibleH' r)]
       cols =
-        concat [map (\(ri, cnt) -> ((ri, ci), cnt)) (zip [0..] (visibleH' c))
-               | (ci, c) <- zip [0..] (transpose grid) ]
+        [((ri, ci), cnt)
+        | (ci, c)   <- zip [0..] (transpose grid)
+        , (ri, cnt) <- zip [0..] (visibleH' c)]
   in HashMap.fromListWith (*) (rows ++ cols)
 
 part1 :: [[Int]] -> Int

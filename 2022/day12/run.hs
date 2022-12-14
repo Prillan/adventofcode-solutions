@@ -1,5 +1,5 @@
-import AoC.Grid
-import AoC.Search
+import AoC.Grid (parseMapGrid, MapGrid)
+import AoC.Search (bfs_)
 
 import Data.Char (ord)
 import Data.List (find)
@@ -40,7 +40,7 @@ part1 g =
   in fromJust $ bfs_ ((== end) . fst) neighbors (start, ord 'a')
 
 part2 :: MapGrid Char -> Int
-part2 g = 
+part2 g =
   let Just (start, _) = find ((== 'S') . snd) . HashMap.toList $ g
       Just (end,   _) = find ((== 'E') . snd) . HashMap.toList $ g
       g' = HashMap.map ord

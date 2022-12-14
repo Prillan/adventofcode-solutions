@@ -1,7 +1,7 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
-import AoC.Draw.Chars
+import AoC.Draw.Chars (readLetters)
 
 import Data.List.Split (chunksOf)
 

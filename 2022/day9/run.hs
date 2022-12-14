@@ -1,7 +1,5 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 import AoC
 
@@ -36,7 +34,7 @@ trace = scanl f (0, 0) . splat
         d (V2 (x, y)) = v2 (x, y - 1)
         r (V2 (x, y)) = v2 (x + 1, y)
         l (V2 (x, y)) = v2 (x - 1, y)
-        dir = \case 
+        dir = \case
             'U' -> u
             'D' -> d
             'R' -> r
@@ -56,13 +54,13 @@ traceN n = scanl f (replicate n 0) . splat
         d (V2 (x, y)) = v2 (x, y - 1)
         r (V2 (x, y)) = v2 (x + 1, y)
         l (V2 (x, y)) = v2 (x - 1, y)
-        dir = \case 
+        dir = \case
             'U' -> u
             'D' -> d
             'R' -> r
             'L' -> l
 
-        f (h:nodes) next = 
+        f (h:nodes) next =
           let h' = dir next h
           in
             h':go next h' nodes
@@ -76,7 +74,10 @@ traceN n = scanl f (replicate n 0) . splat
                     n':go next n' nodes
 
 
+part1 :: [Move] -> Int
 part1 = length . Set.fromList . map snd . trace
+
+part2 :: [Move] -> Int
 part2 = length . Set.fromList . map last . traceN 10
 
 main :: IO ()

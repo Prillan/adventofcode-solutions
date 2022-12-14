@@ -1,10 +1,7 @@
 {-# LANGUAGE TupleSections #-}
-{-# LANGUAGE TypeApplications #-}
-import AoC
-
 import Data.Foldable (find, toList)
 import Data.List.Split (splitOn)
-import Data.Maybe (fromJust, isJust)
+import Data.Maybe (fromJust, isNothing)
 
 import Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
@@ -65,7 +62,7 @@ simulate :: (HashSet (N, N) -> Maybe (N, N)) -> HashSet (N, N) -> Int
 simulate single =
   fst
   . fromJust
-  . find (not . isJust . snd)
+  . find (isNothing . snd)
   . zip [0..]
   . iterate (step single)
   . Just

@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeApplications #-}
-import Data.List (findIndices, sort)
+import Data.List (findIndices, sort, elemIndices)
 import Data.List.Split (chunksOf)
 
 import Control.Applicative ((<|>))
@@ -35,7 +35,7 @@ part1 :: [Tree] -> Int
 part1 =
   sum
   . map (+1)
-  . findIndices (== LT)
+  . elemIndices LT
   . map (\[x1, x2] -> compare x1 x2)
   . chunksOf 2
 
