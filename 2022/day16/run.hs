@@ -161,7 +161,7 @@ part1 vs =
             pure $ ((next, t-steps, open, p), 0)
   in astar stop neighbors potential ("AA", 30, HashSet.empty, sum flows)
 
-part2 vs = maximum $ go 26 "AA" "AA" 0 ["AA"] 0
+part2 vs = maximum $ go 26 "AA" "AA" 0 (HashSet.singleton "AA") 0
   where compacted = compact vs
         flows = HashMap.filter (> 0) $ HashMap.map fst vs
         go t node ttarget trem open released
@@ -170,7 +170,7 @@ part2 vs = maximum $ go 26 "AA" "AA" 0 ["AA"] 0
             let (_, nexts) = compacted HashMap.! node
                 potential = do
                   (steps, next) <- nexts
-                  guard $ not $ next `elem` open
+                  guard $ not $ next `HashSet.member` open
                   guard $ steps <= t
                   pure (steps, next)
             in
@@ -181,10 +181,11 @@ part2 vs = maximum $ go 26 "AA" "AA" 0 ["AA"] 0
                   let flow = flows HashMap.! next
                       steps' = steps + 1
                       pressure = max 0 $ flow * (t - steps')
+                      open' = HashSet.insert next open
                   case compare steps' trem of
-                    LT -> go (t - steps') next ttarget (trem - steps') (next:open) (released + pressure)
-                    GT -> go (t - trem)   ttarget next (steps' - trem) (next:open) (released + pressure)
-                    EQ -> go (t - trem)   ttarget next (steps' - trem) (next:open) (released + pressure)
+                    LT -> go (t - steps') next ttarget (trem - steps') open' (released + pressure)
+                    GT -> go (t - trem)   ttarget next (steps' - trem) open' (released + pressure)
+                    EQ -> go (t - trem)   ttarget next (steps' - trem) open' (released + pressure)
 
 main :: IO ()
 main = main' "input.txt"
