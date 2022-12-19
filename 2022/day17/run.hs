@@ -109,22 +109,32 @@ part1 jets =
           in (max height height', locked `HashSet.union` r, js')
 
 
-
 part2 jets =
-  map (\(h, g, _, c) -> (h, g, c))
+  map (\(s, h, g, _, c) -> (s, h, g, c))
   . drop 1
-  $ scanl' step (0, chamberFloor, cycle $ zip [0::Int ..] jets, (0,0,0,0,0,0)) (cycle $ zip [0::Int ..] rocks)
-  where step (height, locked, js@((ji,_):_), _) (ri, rock) =
+  $ scanl' step (Set.empty, 0, chamberFloor, cycle $ zip [0::Int ..] jets, (0,0,0,0,0,0)) (cycle $ zip [0::Int ..] rocks)
+  where step (!seen, !height, !locked, js@((ji,_):_), _) (ri, rock) =
           let (r, js'@((ji', _):_)) = singleRock height rock locked js
               height' = max height (maximum . map snd $ HashSet.toList r)
+              lowb = minimum $ map snd $ HashSet.toList r
+              locked' = locked `HashSet.union` r
               ix = (ri, (ri + 1) `mod` 5, ji, ji', height, height')
-          in (height', locked `HashSet.union` r, js', ix)
+          in case listToMaybe (topLine lowb height' locked') of
+            Just h | h > 0 ->
+                let locked'' = HashSet.filter ((>= 0) . snd)
+                               .  HashSet.map (\(c, r) -> (c, 1 + r - h))
+                               $ locked
+                    seenix = tce "seen now" (ji, ri, locked'')
+                in if seenix `Set.member` seen
+                   then error "real wat"
+                   else (Set.insert seenix seen, height' - h, locked'', js', ix)
+            _ -> (seen, height', locked', js', ix)
 
 
-topLine :: N -> SetGrid -> [N]
-topLine height g =
+topLine :: N -> N -> SetGrid -> [N]
+topLine from to g =
   filter (\y -> all (\x -> (x, y) `HashSet.member` g) [1..7])
-  [height,height-1..0]
+  [to,to-1..from]
 
 
 main :: IO ()
