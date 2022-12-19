@@ -206,7 +206,7 @@ optimize bp@Blueprint{..} t0 =
       go !s
         | time s <  0 = error $ "FAIL: " ++ show s
         | time s == 0 = [s]
-        | time s == 1 = [s]
+        | time s == 1 = [tick 1 s]
         | otherwise =
           concatMap go (neighbors s)
   in
@@ -220,7 +220,7 @@ test bp = scanl f starting cases
               t = timeTo bp next s
               s' = tick t s
               c = constructTick bp s' next
-          in 
+          in
             if c == target_s
             then c
             else error $ unlines [ "not equal!"
@@ -229,7 +229,6 @@ test bp = scanl f starting cases
                                  , "got     : " <> show c
                                  , "expected: " <> show target_s
                                  ]
-          
 
 cases =
   [ ( 3
@@ -379,7 +378,7 @@ timeTo Blueprint {..} target s@S{..} =
       Clay     -> max 0 $ ceiling $ (clayBot - ore) % oreBots
       Ore      -> max 0 $ ceiling $ (oreBot - ore) % oreBots
       End      -> time
-      
+
 constructTick Blueprint {..} s@S {..} =
   let (geodeOre, geodeObsidian) = geodeBot
       (obsidianOre, obsidianClay) = obsidianBot
@@ -424,9 +423,9 @@ tick n s@S {..} =
 moves s@S {..} =
   concat $
   [ if obsidianBots >= 1 && time >= 2 then [Geode]    else []
-  , if clayBots     >= 1 && time >= 3 then [Obsidian] else []
-  , if                      time >= 4 then [Clay]     else []
-  , if                      time >= 5 then [Ore]      else []
+  , if clayBots     >= 1 && time >= 2 then [Obsidian] else []
+  , if                      time >= 3 then [Clay]     else []
+  , if                      time >= 4 then [Ore]      else []
   , if geodeBots    >= 1              then [End]      else []
   ]
 
@@ -438,9 +437,13 @@ data Move = Geode
   deriving (Show, Eq)
 
 part1 =
-  map (\bp -> (bpId bp, maximum $ map geode (optimize bp 24)))
-  
-part2 = const ()
+  sum
+  . map (uncurry (*))
+  . map (\bp -> (bpId bp, maximum $ map geode (optimize bp 24)))
+
+part2 =
+  map (\bp -> maximum $ map geode (optimize bp 32))
+  . take 3
 
 main :: IO ()
 main = main' "input.txt"
@@ -452,4 +455,4 @@ main' :: FilePath -> IO ()
 main' file = do
    input <- parseAll <$> readFile file
    print (part1 input)
-   print (part2 input)
+   mapM_ print (part2 input)
