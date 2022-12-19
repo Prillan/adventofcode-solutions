@@ -371,13 +371,31 @@ timeTo Blueprint {..} target s@S{..} =
       (obsidianOre, obsidianClay) = obsidianBot
   in
     case target of
-      Geode    -> max 0 $ max (ceiling $ (geodeObsidian - obsidian) % obsidianBots)
-                              (ceiling $ (geodeOre - ore) % oreBots)
-      Obsidian -> max 0 $ max (ceiling $ (obsidianClay - clay) % clayBots)
-                              (ceiling $ (obsidianOre - ore) % oreBots)
-      Clay     -> max 0 $ ceiling $ (clayBot - ore) % oreBots
-      Ore      -> max 0 $ ceiling $ (oreBot - ore) % oreBots
+      Geode    -> max 0 $ max (timeTo' obsidian geodeObsidian obsidianBots)
+                              (timeTo' ore geodeOre oreBots)
+      Obsidian -> max 0 $ max (timeTo' clay obsidianClay clayBots)
+                              (timeTo' ore obsidianOre oreBots)
+      Clay     -> max 0 $ timeTo' ore clayBot oreBots
+      Ore      -> max 0 $ timeTo' ore oreBot oreBots
       End      -> time
+      -- Geode    -> max 0 $ max (ceiling $ (geodeObsidian - obsidian) % obsidianBots)
+      --                         (ceiling $ (geodeOre - ore) % oreBots)
+      -- Obsidian -> max 0 $ max (ceiling $ (obsidianClay - clay) % clayBots)
+      --                         (ceiling $ (obsidianOre - ore) % oreBots)
+      -- Clay     -> max 0 $ ceiling $ (clayBot - ore) % oreBots
+      -- Ore      -> max 0 $ ceiling $ (oreBot - ore) % oreBots
+      -- End      -> time
+
+
+timeTo' :: N -> N -> N -> N
+timeTo' current target bots =
+  case (target - current) `divMod` bots of
+    (x, 0) -> x
+    (x, _) -> x + 1
+{-# INLINE timeTo' #-}
+
+timeToOld current target bots =
+  ceiling $ (target - current) % bots
 
 constructTick Blueprint {..} s@S {..} =
   let (geodeOre, geodeObsidian) = geodeBot
@@ -421,13 +439,24 @@ tick n s@S {..} =
     }
 
 moves s@S {..} =
-  concat $
-  [ if obsidianBots >= 1 && time >= 2 then [Geode]    else []
-  , if clayBots     >= 1 && time >= 2 then [Obsidian] else []
-  , if                      time >= 3 then [Clay]     else []
-  , if                      time >= 4 then [Ore]      else []
-  , if geodeBots    >= 1              then [End]      else []
-  ]
+  let m = concat $
+        [ if obsidianBots >= 1 && time >= 2 then [Geode]    else []
+        , if clayBots     >= 1 && time >= 2 then [Obsidian] else []
+        , if                      time >= 3 then [Clay]     else []
+        , if                      time >= 4 then [Ore]      else []
+        ]
+  in
+    if null m && geodeBots >= 1
+    then [End]
+    else m
+  -- concat $
+  -- [ if obsidianBots >= 1 && time >= 2 then [Geode]    else []
+  -- , if clayBots     >= 1 && time >= 2 then [Obsidian] else []
+  -- , if                      time >= 3 then [Clay]     else []
+  -- , if                      time >= 4 then [Ore]      else []
+  -- , if geodeBots    >= 1              then [End]      else []
+  -- ]
+
 
 data Move = Geode
           | Obsidian
