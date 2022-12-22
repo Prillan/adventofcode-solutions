@@ -225,34 +225,48 @@ rots =
 -- #
 connect cube bounds = fixpoint (linkStep cube bounds) (links cube bounds)
 
+v2Rotate p@(V2 (x, y)) =
+  \case RId   -> p
+        CW    -> v2 (-y,  x)
+        CCW   -> v2 ( y, -x)
+        RHalf -> v2 (-x, -y)
 
-singleStep' g ((xmin, ymin), (xmax, ymax)) dir pos@(V2 (px, py)) =
+glueJump g ((xmin, ymin), (xmax, ymax)) connections cubeBounds dir pos@(V2 (px, py)) =
+  let (lx, ly) = (px `mod` 50, py `mod` 50)
+      side = v2 (px `div` 50, py `div` 50)
+      --- FIXME: Make sure this is looking up the correct thingy
+      (tside, r) = connections HashMap.! tce "trying" (side, dir)
+      baseTarget =
+        case dir of
+          R -> v2 ( 0, ly)
+          L -> v2 (49, ly)
+          D -> v2 (lx,  0)
+          U -> v2 (lx, 49)
+
+      rotated = v2Rotate baseTarget r
+      final = rotated + tside * 50
+  in
+    final
+
+singleStep' g bounds connections cubeBounds dir pos =
   case g HashMap.!? (pos + dirv dir) of
     Just '.' -> pos + dirv dir
     Just '#' -> pos
-    Nothing  ->
-      let candidate =
-            case dir of
-              R -> until ((`HashMap.member` g) . tce "r") (+ dirv dir) (V2 (xmin, py))
-              L -> until ((`HashMap.member` g) . tce "l") (+ dirv dir) (V2 (xmax, py))
-              D -> until ((`HashMap.member` g) . tce "d") (+ dirv dir) (V2 (px, ymin))
-              U -> until ((`HashMap.member` g) . tce "u") (+ dirv dir) (V2 (px, ymax))
-      in
-        case g HashMap.!? candidate of
-          Just '.' -> candidate
-          Just '#' -> pos
-          Nothing  -> error "shouldn't happen"
+    Nothing  -> glueJump g bounds connections cubeBounds dir pos
 
-step' g bounds (!dir, !pos) =
-  \case (Move n)  -> tce ("moved " <> show n) (dir, iterateN n (singleStep' g bounds dir) pos)
-        TurnLeft  -> tce "turned left" (rotate dir CCW, pos)
-        TurnRight -> tce "turned right" (rotate dir CW, pos)
+step' g bounds connections cubeBounds (!dir, !pos) =
+  let single = singleStep' g bounds connections cubeBounds dir
+  in
+    \case (Move n)  -> tce ("moved " <> show n) (dir, iterateN n single pos)
+          TurnLeft  -> tce "turned left" (rotate dir CCW, pos)
+          TurnRight -> tce "turned right" (rotate dir CW, pos)
 
-part2 (g, bounds@((xmin, ymin), _), path) = ()
-  -- let (cube, cb) = toCube g bounds
-  --     starting = step g bounds (R, v2 (xmin, ymin)) (Move 1)
-  --     (dir, pos) = tce "final" $ foldl' (step' g bounds) starting path
-  -- in password dir pos
+part2 (g, bounds@((xmin, ymin), _), path) =
+  let (cube, cb) = toCube g bounds
+      connected = connect cube cb
+      starting = step g bounds (R, v2 (xmin, ymin)) (Move 1)
+      (dir, pos) = tce "final" $ foldl' (step' g bounds connected cb) starting path
+  in password dir pos
 
 main :: IO ()
 main = main' "input.txt"
