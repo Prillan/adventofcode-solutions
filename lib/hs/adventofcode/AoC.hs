@@ -1,6 +1,8 @@
 module AoC ( tce
            , fixpoint
            , fixpointi
+           , fixpointOn
+           , fixpointiOn
            , iterateN
            , iterateN'
            , partitionWith
@@ -63,6 +65,12 @@ fixpoint f a =
   in fst . head . filter (uncurry (==)) $ zip (drop 1 xs) xs
 {-# INLINABLE fixpoint #-}
 
+fixpointOn :: Eq b => (a -> b) -> (a -> a) -> a -> a
+fixpointOn p f a =
+  let xs = iterate f a
+  in fst . head . filter (\(x, y) -> p x == p y) $ zip (drop 1 xs) xs
+{-# INLINABLE fixpointOn #-}
+
 fixpointi :: (Num i, Eq a) => (a -> a) -> a -> (i, a)
 fixpointi f = go 0
   where go i a =
@@ -71,6 +79,15 @@ fixpointi f = go 0
              then (i + 1, a)
              else go (i + 1) a'
 {-# INLINABLE fixpointi #-}
+
+fixpointiOn :: Eq b => (a -> b) -> (a -> a) -> a -> (Int, a)
+fixpointiOn p f = go 0
+  where go i a =
+          let a' = f a
+          in if p a' == p a
+             then (i + 1, a)
+             else go (i + 1) a'
+{-# INLINABLE fixpointiOn #-}
 
 iterateN :: Int -> (a -> a) -> a -> a
 iterateN 0 f = id
