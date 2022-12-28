@@ -1,4 +1,5 @@
-module AoC.Search ( astar_
+module AoC.Search ( astar
+                  , astar_
                   , bfs_
                   , dijkstra
                   , dijkstra_ ) where
@@ -68,17 +69,17 @@ dijkstra_ stop next start = snd <$> dijkstra stop next start
 {-# INLINABLE dijkstra_ #-}
 
 -- TODO: Fix astar
-astar_ :: (Hashable node, Ord cost, Num cost, Eq node)
-       => (node -> Bool)
-       -> (node -> [(node, cost)])
-       -> (node -> cost)
-       -> node
-       -> Maybe cost
-astar_ stop next h start = go (HS.singleton start) (PQueue.singleton 0 (0, start))
+astar :: (Hashable node, Ord cost, Num cost, Eq node)
+      => (node -> Bool)
+      -> (node -> [(node, cost)])
+      -> (node -> cost)
+      -> node
+      -> Maybe (node, cost)
+astar stop next h start = go (HS.singleton start) (PQueue.singleton 0 (0, start))
   where go visited q =
           case PQueue.minView q of
             Just ((!cost, !current), rest)
-              | stop current -> Just cost
+              | stop current -> Just (current, cost)
               | otherwise ->
                 let nexts = HM.fromList (next current) `HM.difference` HS.toMap visited
                     toCheck =
@@ -90,4 +91,14 @@ astar_ stop next h start = go (HS.singleton start) (PQueue.singleton 0 (0, start
                   go (visited `HS.union` HM.keysSet nexts)
                      (toCheck `PQueue.union` rest)
             _ -> Nothing
+{-# INLINABLE astar #-}
+
+-- TODO: Fix astar
+astar_ :: (Hashable node, Ord cost, Num cost, Eq node)
+       => (node -> Bool)
+       -> (node -> [(node, cost)])
+       -> (node -> cost)
+       -> node
+       -> Maybe cost
+astar_ stop next h start = snd <$> astar stop next h start
 {-# INLINABLE astar_ #-}
