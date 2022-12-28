@@ -6,14 +6,16 @@
 import AoC
 import AoC.Search (bfs_)
 
-import Control.Monad (guard, replicateM)
+import Control.Monad (guard, forM_)
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
-import Data.Hashable (Hashable)
-import Data.Ix (index)
+import Data.Ix (index, rangeSize)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import Data.Maybe (fromJust)
+import Data.Vector (Vector)
+import qualified Data.Vector as V
+import qualified Data.Vector.Mutable as MV
 import Data.Void (Void)
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -26,7 +28,10 @@ type Parser a = Parsec Void String a
 type IxValve = Int
 
 ix :: Valve -> IxValve
-ix = index (('A', 'A'), ('Z', 'Z'))
+ix = index bounds
+
+bounds :: ((Char, Char), (Char, Char))
+bounds = (('A', 'A'), ('Z', 'Z'))
 
 numP :: Num a => Parser a
 numP = fromInteger . read <$> some digitChar
@@ -51,7 +56,14 @@ parseAll =
   . map (parse valveP "")
   . lines
 
-compact :: IntMap (N, [IxValve]) -> IntMap (N, [(Int, IxValve)])
+fromIntMap :: IntMap a -> Vector a
+fromIntMap m = V.create do
+  vec <- MV.new (rangeSize bounds)
+  forM_ (IntMap.toList m) \(i, v) ->
+    MV.write vec i v
+  pure vec
+
+compact :: IntMap (N, [IxValve]) -> Vector (N, [(Int, IxValve)])
 compact graph =
   let nonZero = IntMap.filter ((> 0) . fst) graph
       neighbors node = snd $ graph IntMap.! node
@@ -61,7 +73,7 @@ compact graph =
         , from /= to
         ]
   in
-    IntMap.fromList
+    fromIntMap . IntMap.fromList
     $ [ (from, (flow, costs from))
       | (from, (flow, _)) <- (ix ('A', 'A'), graph IntMap.! ix ('A', 'A')):IntMap.toList nonZero
       ]
@@ -72,26 +84,31 @@ part1 vs =
       flows = IntMap.filter (> 0) $ IntMap.map fst vs
       potential (_, t, _, p, _) = max 0 (t - 1) * p
       neighbors (!current, !t, !open, !p, !released) = do
-        let (!flow, nexts) = compacted IntMap.! current
-        toggle <- if flow == 0 || current `IntSet.member` open
-                  then [False]
-                  else [True, False]
-        case toggle of
-          True  ->
-            let open' = IntSet.insert current open
-            in pure $ (current, t-1, open', p - flow, released + (t-1)*flow)
-          False -> do
-            (steps, next) <- nexts
-            pure $ (next, t-steps, open, p, released)
+        let (_, nexts) = compacted V.! current
+        (steps, next) <- nexts
+        guard $ steps < t
+        guard $ not $ next `IntSet.member` open
+        let open' = IntSet.insert next open
+            (flow, _) = compacted V.! next
+        pure ( next
+             , t-steps-1
+             , open'
+             , p - flow
+             , released + (t-steps-1)*flow
+             )
       go m =
         \case [] -> m
               c@(_, t, _, p, released):rest
                 | t <= 0 || p <= 0 -> go (max released m) rest
                 | released + potential c < m -> go m rest
                 | otherwise ->
-                    go m (neighbors c ++ rest)
+                  let nbhd = neighbors c
+                  in
+                    if null nbhd
+                    then go (max m released) rest
+                    else go m (nbhd ++ rest)
   in
-    go 0 [(ix ('A', 'A'), 30, IntSet.empty, sum flows, 0)]
+    go 0 [(ix ('A', 'A'), 30, IntSet.singleton (ix ('A', 'A')), sum flows, 0)]
 
 part2 :: IntMap (N, [IxValve]) -> N
 part2 vs = go 0 [( 26
@@ -111,29 +128,24 @@ part2 vs = go 0 [( 26
             | t <= 0 || p == 0 -> go (max released m) rest
             | released + potential c < m -> go m rest
             | otherwise ->
-              let (_, nexts) = compacted IntMap.! node
+              let (_, nexts) = compacted V.! node
                   nbhd = do
                     (steps, next) <- nexts
                     guard $ not $ next `IntSet.member` open
-                    guard $ steps <= t
-                    pure (steps, next)
+                    guard $ steps < t
+                    let (flow, _) = compacted V.! next
+                        steps' = steps + 1
+                        pressure = max 0 $ flow * (t - steps')
+                        p' = p - flow
+                        open' = IntSet.insert next open
+                    pure $ case compare steps' trem of
+                             LT -> (t - steps', next, ttarget, trem - steps', open', p', released + pressure)
+                             GT -> (t - trem  , ttarget, next, steps' - trem, open', p', released + pressure)
+                             EQ -> (t - trem  , ttarget, next, steps' - trem, open', p', released + pressure)
               in
-                case nbhd of
-                  [] -> go (max released m) rest
-                  xs ->
-                    let new = do
-                          (steps, next) <- xs
-                          let flow = flows IntMap.! next
-                              steps' = steps + 1
-                              pressure = max 0 $ flow * (t - steps')
-                              p' = p - flow
-                              open' = IntSet.insert next open
-                          pure $ case compare steps' trem of
-                            LT -> (t - steps', next, ttarget, trem - steps', open', p', released + pressure)
-                            GT -> (t - trem  , ttarget, next, steps' - trem, open', p', released + pressure)
-                            EQ -> (t - trem  , ttarget, next, steps' - trem, open', p', released + pressure)
-                    in
-                      go m (new ++ rest)
+                if null nbhd
+                then go (max released m) rest
+                else go m (nbhd ++ rest)
 
 main :: IO ()
 main = main' "input.txt"
