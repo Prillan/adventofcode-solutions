@@ -7,13 +7,12 @@ import AoC
 import AoC.Search (bfs_)
 
 import Control.Monad (guard, replicateM)
-import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HashMap
-import Data.HashSet (HashSet)
-import qualified Data.HashSet as HashSet
-import Data.Hashable (Hashable)
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
+import Data.Hashable (Hashable)
+import Data.Ix (index)
+import Data.IntMap (IntMap)
+import qualified Data.IntMap as IntMap
 import Data.Maybe (fromJust)
 import Data.Void (Void)
 import Text.Megaparsec
@@ -23,6 +22,11 @@ type Valve = (Char, Char)
 type N = Int
 
 type Parser a = Parsec Void String a
+
+type IxValve = Int
+
+ix :: Valve -> IxValve
+ix = index (('A', 'A'), ('Z', 'Z'))
 
 numP :: Num a => Parser a
 numP = fromInteger . read <$> some digitChar
@@ -40,41 +44,41 @@ valveP = do
   valves <- sepBy1 nameP (string ", ")
   pure (valve, (rate, valves))
 
-parseAll :: String -> HashMap Valve (N, [Valve])
+parseAll :: String -> IntMap (N, [IxValve])
 parseAll =
-  HashMap.fromList
-  . map (\(Right x) -> x)
+  IntMap.fromList
+  . map (\(Right (v, (rate, valves))) -> (ix v, (rate, map ix valves)))
   . map (parse valveP "")
   . lines
 
-compact :: HashMap Valve (N, [Valve]) -> HashMap Valve (N, [(Int, Valve)])
+compact :: IntMap (N, [IxValve]) -> IntMap (N, [(Int, IxValve)])
 compact graph =
-  let nonZero = HashMap.filter ((> 0) . fst) graph
-      neighbors node = snd $ graph HashMap.! node
+  let nonZero = IntMap.filter ((> 0) . fst) graph
+      neighbors node = snd $ graph IntMap.! node
       costs from =
         [ (fromJust $ bfs_ (== to) neighbors from, to)
-        | to <- HashMap.keys nonZero
+        | to <- IntMap.keys nonZero
         , from /= to
         ]
   in
-    HashMap.fromList
+    IntMap.fromList
     $ [ (from, (flow, costs from))
-      | (from, (flow, _)) <- (('A', 'A'), graph HashMap.! ('A', 'A')):HashMap.toList nonZero
+      | (from, (flow, _)) <- (ix ('A', 'A'), graph IntMap.! ix ('A', 'A')):IntMap.toList nonZero
       ]
 
-part1 :: HashMap Valve (N, [Valve]) -> N
+part1 :: IntMap (N, [IxValve]) -> N
 part1 vs =
   let compacted = compact vs
-      flows = HashMap.filter (> 0) $ HashMap.map fst vs
+      flows = IntMap.filter (> 0) $ IntMap.map fst vs
       potential (_, t, _, p, _) = max 0 (t - 1) * p
       neighbors (!current, !t, !open, !p, !released) = do
-        let (!flow, nexts) = compacted HashMap.! current
-        toggle <- if flow == 0 || current `HashSet.member` open
+        let (!flow, nexts) = compacted IntMap.! current
+        toggle <- if flow == 0 || current `IntSet.member` open
                   then [False]
                   else [True, False]
         case toggle of
           True  ->
-            let open' = HashSet.insert current open
+            let open' = IntSet.insert current open
             in pure $ (current, t-1, open', p - flow, released + (t-1)*flow)
           False -> do
             (steps, next) <- nexts
@@ -87,12 +91,19 @@ part1 vs =
                 | otherwise ->
                     go m (neighbors c ++ rest)
   in
-    go 0 [(('A', 'A'), 30, HashSet.empty, sum flows, 0)]
+    go 0 [(ix ('A', 'A'), 30, IntSet.empty, sum flows, 0)]
 
-part2 :: HashMap Valve (N, [Valve]) -> N
-part2 vs = go 0 [(26, ('A', 'A'), ('A', 'A'), 0, HashSet.singleton ('A', 'A'), sum flows, 0)]
+part2 :: IntMap (N, [IxValve]) -> N
+part2 vs = go 0 [( 26
+                 , ix ('A', 'A')
+                 , ix ('A', 'A')
+                 , 0
+                 , IntSet.singleton (ix ('A', 'A'))
+                 , sum flows
+                 , 0
+                 )]
   where compacted = compact vs
-        flows = HashMap.filter (> 0) $ HashMap.map fst vs
+        flows = IntMap.filter (> 0) $ IntMap.map fst vs
         potential (t, _, _, _, _, p, _) = max 0 (t - 1) * p
         go m = \case
           [] -> m
@@ -100,10 +111,10 @@ part2 vs = go 0 [(26, ('A', 'A'), ('A', 'A'), 0, HashSet.singleton ('A', 'A'), s
             | t <= 0 || p == 0 -> go (max released m) rest
             | released + potential c < m -> go m rest
             | otherwise ->
-              let (_, nexts) = compacted HashMap.! node
+              let (_, nexts) = compacted IntMap.! node
                   nbhd = do
                     (steps, next) <- nexts
-                    guard $ not $ next `HashSet.member` open
+                    guard $ not $ next `IntSet.member` open
                     guard $ steps <= t
                     pure (steps, next)
               in
@@ -112,11 +123,11 @@ part2 vs = go 0 [(26, ('A', 'A'), ('A', 'A'), 0, HashSet.singleton ('A', 'A'), s
                   xs ->
                     let new = do
                           (steps, next) <- xs
-                          let flow = flows HashMap.! next
+                          let flow = flows IntMap.! next
                               steps' = steps + 1
                               pressure = max 0 $ flow * (t - steps')
                               p' = p - flow
-                              open' = HashSet.insert next open
+                              open' = IntSet.insert next open
                           pure $ case compare steps' trem of
                             LT -> (t - steps', next, ttarget, trem - steps', open', p', released + pressure)
                             GT -> (t - trem  , ttarget, next, steps' - trem, open', p', released + pressure)
