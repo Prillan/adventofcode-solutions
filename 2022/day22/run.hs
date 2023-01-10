@@ -6,6 +6,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 import AoC
 import AoC.Grid
+import AoC.Parse (numP)
 
 import Control.Monad (guard)
 import Data.Bifunctor
@@ -43,9 +44,6 @@ data Instr = Move N
            | TurnLeft
            | TurnRight
   deriving (Show, Eq)
-
-numP :: Num a => Parser a
-numP = fromInteger . read <$> some digitChar
 
 pathP :: Parser [Instr]
 pathP = many instrP

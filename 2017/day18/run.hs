@@ -1,5 +1,7 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE LambdaCase #-}
+import AoC.Parse (numP)
+
 import Control.Monad (when)
 import Control.Monad.State (State, execState, get, gets, modify', put)
 import Data.Void (Void)
@@ -73,9 +75,6 @@ reg r = regLookup r . regs
 
 send :: Integer -> Program ()
 send i = modify' (setState $ Sending i)
-
-numP :: Parser Integer
-numP = read <$> ((++) <$> many (char '-') <*> some digitChar)
 
 regValP :: Parser (Program Integer)
 regValP = (pure <$> numP) <|> (gets . reg <$> asciiChar)

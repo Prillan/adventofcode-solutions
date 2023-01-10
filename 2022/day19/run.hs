@@ -6,6 +6,7 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TupleSections #-}
 import AoC
+import AoC.Parse (numP)
 
 import Control.Monad (guard)
 import Data.Hashable (Hashable)
@@ -24,9 +25,6 @@ data Blueprint = Blueprint { bpId        :: Int
                            , geodeBot    :: (N, N)
                            }
   deriving Show
-
-numP :: (Num a, Read a) => Parser a
-numP = read <$> many digitChar
 
 blueprintP :: Parser Blueprint
 blueprintP =

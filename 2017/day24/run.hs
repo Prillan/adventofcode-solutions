@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+import AoC.Parse (numP)
 import Data.Ord (comparing)
 import Data.List (maximumBy, nub, sort)
 import Data.Semigroup ((<>))
@@ -24,9 +25,6 @@ instance Eq Component where
 
 instance Ord Component where
   compare (C x1 x2) (C y1 y2) = compare x1 y1 <> compare x2 y2
-
-numP :: Num a => Parser a
-numP = fromInteger . read <$> some digitChar
 
 componentP :: Parser Component
 componentP = do

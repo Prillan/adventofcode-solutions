@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
+import           AoC.Parse (numP)
 import           Data.Functor ((<&>))
 import           Data.List (permutations, group, minimum, maximum, minimumBy, maximumBy)
 import           Data.Map.Strict (Map)
@@ -26,9 +27,6 @@ data Instr = Cpy ValReg ValReg
   deriving (Show, Eq)
 
 type Parser a = Parsec Void String a
-
-numP :: Parser Int
-numP = read <$> ((++) <$> many (char '-') <*> some digitChar)
 
 regP :: Parser Reg
 regP = oneOf "abcd" <&> \case

@@ -4,6 +4,7 @@
 {-# LANGUAGE TypeApplications #-}
 import AoC
 import AoC.Grid
+import AoC.Parse (numP)
 
 import Data.Foldable
 import Data.IntSet (IntSet)
@@ -37,12 +38,6 @@ instrP = do
   _ <- char ','
   z <- boundsP 'z'
   pure $ Instr b x y z
-
-numP :: (Num a, Read a) => Parser a
-numP = do
-  sgn    <- optional (char '-')
-  digits <- many digitChar
-  pure . read $ toList sgn ++ digits
 
 boundsP :: Char -> Parser Bounds
 boundsP c = do

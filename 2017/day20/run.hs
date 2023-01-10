@@ -1,3 +1,5 @@
+import AoC.Parse (numP)
+
 import Control.Applicative
 import Data.Foldable
 import Data.Ord
@@ -48,12 +50,6 @@ type Parser = Parsec Void String
 unsafeRight :: Show a => Either a b -> b
 unsafeRight (Right x) = x
 unsafeRight (Left x) = error $ show x
-
-numP :: Parser Integer
-numP = do
-  sign <- maybe 1 (const $ -1) <$> optional (char '-')
-  num <- read <$> some digitChar
-  pure $ sign * num
 
 v3P :: Parser (V3 Integer)
 v3P = do

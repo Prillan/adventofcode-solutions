@@ -4,6 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 import AoC
+import AoC.Parse (numP)
 import AoC.Search (bfs_)
 
 import Control.Monad (guard, forM_)
@@ -32,9 +33,6 @@ ix = index bounds
 
 bounds :: ((Char, Char), (Char, Char))
 bounds = (('A', 'A'), ('Z', 'Z'))
-
-numP :: Num a => Parser a
-numP = fromInteger . read <$> some digitChar
 
 nameP :: Parser Valve
 nameP = (,) <$> upperChar <*> upperChar

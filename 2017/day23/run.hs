@@ -1,6 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE BlockArguments #-}
-
+import AoC.Parse (numP)
 import Control.Monad (when)
 import Control.Monad.State (State, execState, get, gets, modify')
 import Data.HashMap.Strict (HashMap)
@@ -39,9 +39,6 @@ incrementOp str s =
 
 reg :: Reg -> ProgramState -> Int
 reg r = regLookup r . regs
-
-numP :: Parser Int
-numP = read <$> ((++) <$> many (char '-') <*> some digitChar)
 
 regValP :: Parser (Program Int)
 regValP = (pure <$> numP) <|> (gets . reg <$> asciiChar)

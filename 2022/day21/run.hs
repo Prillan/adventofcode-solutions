@@ -1,7 +1,7 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE LambdaCase #-}
-
+import AoC.Parse (numP)
 
 import Control.Monad (replicateM)
 import Data.Functor (($>))
@@ -17,9 +17,6 @@ type Parser = Parsec Void String
 
 type Input a = HashMap String (Expr a)
 type Row a = (String, Expr a)
-
-numP :: (Read a, Num a) => Parser a
-numP = read <$> ((++) <$> many (char '-') <*> some digitChar)
 
 monkeyP :: Parser String
 monkeyP = replicateM 4 letterChar
