@@ -1,7 +1,5 @@
 """
-This is the assembler translated to python, it was easier to
-translate directly into an imperative language rather than
-a functional one.
+Disassembled input.
 """
 
 a = b = c = d = e = f = g = h = 0

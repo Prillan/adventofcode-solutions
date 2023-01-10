@@ -1,6 +1,10 @@
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BlockArguments #-}
+
+import Control.Monad (when)
+import Control.Monad.State (State, execState, get, gets, modify')
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap
-import Control.Monad.State
 import Data.Void (Void)
 import Text.Megaparsec hiding (State)
 import Text.Megaparsec.Char
@@ -15,21 +19,16 @@ type Reg = Char
 data ProgramState = PState { program       :: HashMap Int (Program ())
                            , pointer       :: Int
                            , programLength :: Int
-                           , regs          :: HashMap Reg Integer
-                           , operations    :: HashMap String Integer }
-
-instance Show ProgramState where
-  show s = "State { pointer = " ++ show (pointer s) ++ ", "
-           ++ "regs = " ++ show (regs s) ++ ", "
-           ++ "ops = " ++ show (operations s) ++ " }"
+                           , regs          :: HashMap Reg Int
+                           , operations    :: HashMap String Int }
 
 type Program = State ProgramState
 
-setReg :: Reg -> Integer -> ProgramState -> ProgramState
+setReg :: Reg -> Int -> ProgramState -> ProgramState
 setReg r v s = s { regs = HashMap.insert r v (regs s) }
 
-regLookup :: Reg -> HashMap Reg Integer -> Integer
-regLookup r = maybe 0 id . HashMap.lookup r
+regLookup :: Reg -> HashMap Reg Int -> Int
+regLookup = HashMap.findWithDefault 0
 
 incrementOp :: String -> ProgramState -> ProgramState
 incrementOp str s =
@@ -38,62 +37,57 @@ incrementOp str s =
   in
     s { operations = HashMap.insert str (prev + 1) ops }
 
-reg :: Reg -> ProgramState -> Integer
+reg :: Reg -> ProgramState -> Int
 reg r = regLookup r . regs
 
-numP :: Parser Integer
-numP = do
-  sign <- maybe 1 (const $ -1) <$> optional (char '-')
-  num <- read <$> some digitChar
-  pure $ sign * num
+numP :: Parser Int
+numP = read <$> ((++) <$> many (char '-') <*> some digitChar)
 
-regValP :: Parser (Program Integer)
+regValP :: Parser (Program Int)
 regValP = (pure <$> numP) <|> (gets . reg <$> asciiChar)
 
-operation :: (Integer -> Integer -> Integer)
+operation :: (Int -> Int -> Int)
           -> Reg
-          -> Program Integer
+          -> Program Int
           -> Program ()
 operation op x y = do
   vx <- gets (reg x)
   vy <- y
   modify' (setReg x (vx `op` vy))
 
-operationP :: (Integer -> Integer -> Integer)
+operationP :: (Int -> Int -> Int)
            -> String
            -> Parser (Program ())
 operationP op str = do
-  string str
-  spaceChar
+  _ <- string str
+  _ <- spaceChar
   x <- asciiChar
-  spaceChar
+  _ <- spaceChar
   y <- regValP
-  pure $ do
+  pure do
     operation op x y
     modify' (incrementOp str)
 
 jnzP :: Parser (Program ())
 jnzP = do
-  string "jnz "
+  _ <- string "jnz "
   x <- regValP
-  spaceChar
+  _ <- spaceChar
   y <- regValP
-  pure $ do
+  pure do
     vx <- x
-    if vx /= 0
-      then do
-        vy <- y
-        modify' (\s -> s { pointer = pointer s + fromInteger vy - 1 })
-        modify' $ incrementOp "jnz"
-      else pure ()
+    when (vx /= 0) do
+      vy <- y
+      modify' (\s -> s { pointer = pointer s + vy - 1 })
+      modify' $ incrementOp "jnz"
 
 setP :: Parser (Program ())
 setP = do
-  string "set "
+  _ <- string "set "
   x <- asciiChar
-  spaceChar
+  _ <- spaceChar
   y <- regValP
-  pure $ do
+  pure do
     vy <- y
     modify' (incrementOp "set" . setReg x vy)
 
@@ -107,12 +101,19 @@ modP :: Parser (Program ())
 modP = operationP mod "mod"
 
 parseInstruction :: Parser (Program ())
-parseInstruction = setP <|> mulP <|> modP <|> jnzP <|> subP
+parseInstruction =
+  choice [ setP
+         , mulP
+         , modP
+         , jnzP
+         , subP
+         ]
 
 parseAll :: String -> [Program ()]
 parseAll =
-  map unsafeRight .
-  map (parse parseInstruction "") . lines
+  map unsafeRight
+  . map (parse parseInstruction "")
+  . lines
 
 eval :: Program ()
 eval = do
@@ -124,17 +125,35 @@ eval = do
       eval
     Nothing -> pure ()
 
-part1 :: [Program ()] -> ((), ProgramState)
+part1 :: [Program ()] -> Int
 part1 instr =
   let initial = PState { pointer = 0
                        , program = HashMap.fromList (zip [0..] instr)
                        , programLength = length instr
                        , regs = HashMap.empty
                        , operations = HashMap.empty }
+      final = execState eval initial
   in
-    runState eval initial
+    operations final HashMap.! "mul"
+
+-- Translated code, not sure if it's even worth it to come up with a
+-- general solution. See disassembled.py for the imperative version.
+part2 :: a -> Int
+part2 _ = go 1 108400 125400 0
+  where go :: Int -> Int -> Int -> Int -> Int
+        go !a !b !c !h =
+         case (check b, b == c) of
+           (False, False) -> go a (b + 17) c h
+           (True, False)  -> go a (b + 17) c (h + 1)
+           (False, True)  -> h
+           (True, True)   -> h + 1
+        check b = any (p b) [2..b-1]
+        p b d =
+          let (q, r) = b `divMod` d
+          in r == 0 && q >= 2
 
 main :: IO ()
 main = do
    input <- parseAll <$> readFile "input.txt"
    print (part1 input)
+   print (part2 input)
