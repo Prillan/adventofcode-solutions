@@ -128,7 +128,7 @@ def main():
         default="hs",
     )
     shell_parser.add_argument("day", type=int)
-    shell_parser.add_argument("year", type=int, default=2022, nargs="?")
+    shell_parser.add_argument("year", type=int, default=2023, nargs="?")
 
     config_parser = subparsers.add_parser("config")
     config_parser.add_argument("--token", type=str, default=missing)
@@ -201,7 +201,7 @@ def leaderboard(leaderboard_id: int):
     cache_file = cache_dir / f"{leaderboard_id}.json"
     if not cache_file.exists() or age(cache_file) >= timedelta(minutes=15):
         client = Client.from_config(load_config())
-        lbdata = client.leaderboard(2022, leaderboard_id)
+        lbdata = client.leaderboard(2023, leaderboard_id)
         with cache_file.open("w") as f:
             json.dump(lbdata, f)
     else:
