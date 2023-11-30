@@ -64,30 +64,32 @@ moveN :: Int -> Cup -> Cups -> ST s Cups
 moveN n cupMax Cups {..} = V.thaw cups >>= go n currentCup lastCup
   where go :: Int -> Int -> Int -> MVector s Int -> ST s Cups
         go 0 curr l cs = Cups <$> V.freeze cs <*> pure curr <*> pure l
-        go i curr l cs = do
-          _:c1:c2:c3:_ <- readN 4 curr cs
-          let dests = filter (\x -> x /= c1 && x /= c2 && x /= c3)
-                      . drop 1
-                      $ iterate (\case 0 -> cupMax - 1
-                                       x -> x - 1) curr
-              dest = head dests
-          afterDest <- VM.read cs dest
-          afterC3 <- VM.read cs c3
-          let toInsert :: [(Int, Int)]
-              toInsert
-                | dest == l =
-                  [ (dest, c1)
-                  , (c3, curr)
-                  , (curr, afterC3) ]
-                | otherwise =
-                  [ (dest, c1)
-                  , (c3, afterDest)
-                  , (l, curr)
-                  , (curr, afterC3) ]
-              last' = curr
-              curr' = afterC3
-          update cs toInsert
-          go (i - 1) curr' last' cs
+        go i curr l cs =
+          readN 4 curr cs >>= \case
+            _:c1:c2:c3:_ -> do
+              let dests = filter (\x -> x /= c1 && x /= c2 && x /= c3)
+                          . drop 1
+                          $ iterate (\case 0 -> cupMax - 1
+                                           x -> x - 1) curr
+                  dest = head dests
+              afterDest <- VM.read cs dest
+              afterC3 <- VM.read cs c3
+              let toInsert :: [(Int, Int)]
+                  toInsert
+                    | dest == l =
+                      [ (dest, c1)
+                      , (c3, curr)
+                      , (curr, afterC3) ]
+                    | otherwise =
+                      [ (dest, c1)
+                      , (c3, afterDest)
+                      , (l, curr)
+                      , (curr, afterC3) ]
+                  last' = curr
+                  curr' = afterC3
+              update cs toInsert
+              go (i - 1) curr' last' cs
+            _ -> error "unreachable"
 
 part1 :: [Cup] -> String
 part1 input =
