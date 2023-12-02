@@ -166,17 +166,25 @@ def exec_shell(language: str, day: int, year: int):
     if not run.exists():
         template = Path("template") / run.name
         run.write_text(template.read_text())
+        stage(run)
 
     input_file = target_dir / "input.txt"
     if not input_file.exists():
         print("INFO: Fetching missing input... ", file=sys.stderr, end="")
         input_file.write_text(client.input(year, day))
+        stage(input_file)
         print("Done!", file=sys.stderr)
 
     # EXEC
     os.chdir(target_dir)
     os.execvp(
         "nix", ["nix", "develop", "--quiet", "--no-warn-dirty", f".#langs.{language}"]
+    )
+
+
+def stage(p: Path):
+    return subprocess.run(
+        ["git", "add", p]
     )
 
 
