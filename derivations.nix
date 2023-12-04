@@ -14,52 +14,63 @@ let
           inherit name extension slug;
         };
       };
-    in
-    pkgs.stdenv.mkDerivation {
-      name = "aoc-${name}-year${toString y}-day${toString d}";
-      src = builtins.filterSource
-        (path: type:
-          (matches ".*.${extension}" path) || (matches ".*.txt" path))
-        (dayPath y d);
-      buildInputs = buildInputs ++ [ pkgs.jq ];
-      challengeMeta = builtins.toJSON challengeMeta;
-      passAsFile = [ "challengeMeta" ];
-      buildPhase =
-        if builtins.pathExists (dayLangSkipPath y d lang) then
-          "touch skip"
-        else
-          buildPhase;
-      installPhase = ''
-        mkdir -p $out
-        if ! [ -e skip ]; then
-          mkdir -p $out/bin
-          cp run $out/bin
-        fi
-        jq ".status = \"$(cat status)\"" \
-          < $challengeMetaPath \
-          > $out/meta.json
-      '';
-      doCheck = true;
-      checkPhase = ''
-        if ! [ -e expected.txt ] || [ -e skip ]; then
-          echo '?' > status
-        else
-          touch input.txt
-          time ./run input.txt < input.txt > result.txt
-          if diff -B -Z result.txt expected.txt; then
-            echo 'Got the expected results!'
-            echo 'G' > status
+      binary = pkgs.stdenv.mkDerivation {
+        name = "aoc-binary-${name}-year${toString y}-day${toString d}";
+        src = builtins.filterSource
+          (path: type: matches ".*.${extension}" path)
+          (dayPath y d);
+        buildInputs = buildInputs;
+        buildPhase =
+          if builtins.pathExists (dayLangSkipPath y d lang) then
+            "touch skip"
           else
-            echo 'Oh-oh, tests failed!'
-            echo Got
-            cat result.txt
-            echo Expected
-            cat expected.txt
-            echo 'B' > status
+            buildPhase;
+        installPhase = ''
+          mkdir -p $out
+          if [ -e skip ]; then
+            touch $out/skip
+          else
+            mkdir -p $out/bin
+            cp run $out/bin
           fi
-        fi
-      '';
-    };
+        '';
+      };
+    in
+      pkgs.stdenv.mkDerivation {
+        name = "aoc-${name}-year${toString y}-day${toString d}";
+        src = builtins.filterSource
+          (path: type: matches ".*.txt" path)
+          (dayPath y d);
+        buildInputs = [ binary ] ++ [ pkgs.jq ];
+        challengeMeta = builtins.toJSON challengeMeta;
+        passAsFile = [ "challengeMeta" ];
+        doCheck = true;
+        checkPhase = ''
+          if ! [ -e expected.txt ] || [ -e ${binary}/skip ]; then
+            echo '?' > status
+          else
+            touch input.txt
+            time run input.txt < input.txt > result.txt
+            if diff -B -Z result.txt expected.txt; then
+              echo 'Got the expected results!'
+              echo 'G' > status
+            else
+              echo 'Oh-oh, tests failed!'
+              echo Got
+              cat result.txt
+              echo Expected
+              cat expected.txt
+              echo 'B' > status
+            fi
+          fi
+        '';
+        installPhase = ''
+          mkdir -p $out
+          jq ".status = \"$(cat status)\"" \
+            < $challengeMetaPath \
+            > $out/meta.json
+        '';
+      };
   dayPath = y: d: ./. + "/${y}/day${toString d}";
   dayLangPath = y: d: lang: dayPath y d + "/run.${lang.extension}";
   dayLangSkipPath = y: d: lang: dayPath y d + "/.skip.${lang.extension}";

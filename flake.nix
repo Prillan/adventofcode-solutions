@@ -34,6 +34,7 @@
         };
         packages = {
           aoc = aoc;
+          days = derivations;
         };
         devShells =
           let langShell = lang: { name, buildInputs, shellRunHelp, extension, ... }: pkgs.mkShell {
