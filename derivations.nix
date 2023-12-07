@@ -15,6 +15,7 @@ let
         };
       };
       binary = pkgs.stdenv.mkDerivation {
+        __contentAddressed = true;
         name = "aoc-binary-${name}-year${toString y}-day${toString d}";
         src = builtins.filterSource
           (path: type: matches ".*.${extension}" path)
@@ -50,7 +51,8 @@ let
             echo '?' > status
           else
             touch input.txt
-            time run input.txt < input.txt > result.txt
+            # Note: absolute path needed for the nix runner!!!
+            time run $(pwd)/input.txt < input.txt > result.txt
             if diff -B -Z result.txt expected.txt; then
               echo 'Got the expected results!'
               echo 'G' > status
@@ -66,7 +68,7 @@ let
         '';
         installPhase = ''
           mkdir -p $out
-          jq ".status = \"$(cat status)\"" \
+          jq ".status = \"$(cat status)\" | .binaryDrv = \"${binary}\"" \
             < $challengeMetaPath \
             > $out/meta.json
         '';
@@ -99,4 +101,7 @@ let
     let flatten1 = xs: concatLists (map attrValues xs);
     in flatten1 (flatten1 (attrValues drvs));
 in
-drvs // { all = flat; }
+drvs // {
+  all = flat;
+  tree = pkgs.linkFarm "tree" (map (drv: {name=drv.name; path=drv;}) flat);
+}

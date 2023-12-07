@@ -71,7 +71,7 @@
       buildInputs = [ pkgs.makeWrapper runner ];
       buildPhase = ''
         mkdir -p $out/share/
-        cp $src/{run.nix,input.txt} $out/share/
+        cp $src/run.nix $out/share/
 
         makeWrapper ${runner}/bin/nix-eval run \
           --set TARGET $out/share/run.nix

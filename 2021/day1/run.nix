@@ -1,11 +1,11 @@
-{ lib ? import ../../lib/nix }:
+{ lib ? import ../../lib/nix, inputFile }:
 with lib;
 
 let
   parse = readInt;
   parseAll = x: map parse (lines x);
 
-  input = parseAll (readFile ./input.txt);
+  input = parseAll (readFile inputFile);
 
   countIncreasing = xs:
     let f = { count ? 0, last ? null }: current: {
