@@ -128,7 +128,7 @@ def main():
         default="hs",
     )
     shell_parser.add_argument("day", type=int)
-    shell_parser.add_argument("year", type=int, default=2023, nargs="?")
+    shell_parser.add_argument("year", type=int, default=2024, nargs="?")
 
     config_parser = subparsers.add_parser("config")
     config_parser.add_argument("--token", type=str, default=missing)
