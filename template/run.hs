@@ -6,6 +6,7 @@
 import AoC
 import AoC.Grid
 
+import Control.Monad (guard)
 import Data.Bifunctor
 import Data.Foldable
 import Data.List
@@ -23,6 +24,9 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IntSet
+import Data.Vector.Unboxed (Vector)
+import qualified Data.Vector.Unboxed as V
+import qualified Data.Vector.Unboxed.Mutable as MV
 
 type N = Int
 

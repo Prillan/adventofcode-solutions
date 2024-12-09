@@ -3,9 +3,9 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
-import Data.Foldable
+import Data.Foldable (forM_)
 import Data.List.Split (chunksOf)
-import Data.Maybe
+import Data.Maybe (fromJust)
 
 import Data.Word (Word16)
 
@@ -46,7 +46,7 @@ checksum :: Vector N -> Int
 checksum = V.sum . V.imap (\i -> \case v | v == maxBound -> 0
                                          | otherwise     -> i * fromIntegral v)
 
-sliceSwap :: MV.Unbox a => Int -> Int -> Int -> Vector a -> Vector a
+sliceSwap :: Int -> Int -> Int -> Vector N -> Vector N
 sliceSwap i j c = V.modify \mv ->
   forM_ [0..c-1] \k ->
     MV.swap mv (i + k) (j + k)
