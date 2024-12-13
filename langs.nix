@@ -19,6 +19,7 @@
             fingertree
             hashable
             lens
+            matrix
             megaparsec
             multiset
             pipes
