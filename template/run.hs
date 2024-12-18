@@ -30,8 +30,11 @@ import qualified Data.Vector.Unboxed.Mutable as MV
 
 type N = Int
 
+-- type Input = _
+
 parse = id
 
+-- parseAll :: String -> Input
 parseAll = map parse  . lines
 
 part1 = id
