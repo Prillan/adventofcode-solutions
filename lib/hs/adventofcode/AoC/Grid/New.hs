@@ -7,6 +7,7 @@ module AoC.Grid.New where
 import Prelude hiding (lookup)
 
 import AoC (V2(..), v2)
+import Data.Word (Word8)
 import Data.List (groupBy, transpose)
 import Data.Maybe (catMaybes, isJust, mapMaybe)
 
@@ -100,6 +101,7 @@ type UArrayGrid = UArray (Int, Int)
 instance IArray UArray e => Grid (UArrayGrid e) where
   {-# SPECIALIZE instance Grid (UArrayGrid Char) #-}
   {-# SPECIALIZE instance Grid (UArrayGrid Int) #-}
+  {-# SPECIALIZE instance Grid (UArrayGrid Word8) #-}
   {-# SPECIALIZE instance Grid (UArrayGrid Bool) #-}
   type Cell (UArrayGrid e) = e
   toLists g =
@@ -159,6 +161,24 @@ toMapGrid :: [[a]] -> HashMap (Int, Int) a
 toMapGrid xs =
   HashMap.fromList [((ci, ri), cell) | (ri, row) <- zip [0..] xs
                                      , (ci, cell) <- zip [0..] row]
+
+toArrayGrid :: [[a]] -> ArrayGrid a
+toArrayGrid xs =
+  let h = length xs
+      w = maximum (map length xs)
+  in UA.array ((0, 0), (w - 1, h - 1))
+              [((ci, ri), cell) | (ri, row) <- zip [0..] xs
+                                , (ci, cell) <- zip [0..] row
+                                ]
+
+toUArrayGrid :: IArray UArray a => [[a]] -> UArrayGrid a
+toUArrayGrid xs =
+  let h = length xs
+      w = maximum (map length xs)
+  in UA.array ((0, 0), (w - 1, h - 1))
+              [((ci, ri), cell) | (ri, row) <- zip [0..] xs
+                                , (ci, cell) <- zip [0..] row
+                                ]
 
 ppGrid :: (a -> Char) -> [[a]] -> String
 ppGrid pp = unlines . map (map pp)
