@@ -8,7 +8,7 @@ let lib = ./.;
         shift
       fi
       INPUT="$1"
-      ${pkgs.nixUnstable}/bin/nix eval \
+      ${pkgs.nixVersions.latest}/bin/nix eval \
         --extra-experimental-features nix-command \
         --eval-store $TMP \
         --option store $TMP \

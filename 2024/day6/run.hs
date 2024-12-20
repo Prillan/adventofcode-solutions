@@ -4,11 +4,12 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 import AoC
-import AoC.Grid
+import AoC.Grid.New as Grid
 
 import Data.Foldable (toList)
 import Data.Maybe (isJust)
 
+import qualified Data.Array.IArray as A
 import Data.HashMap.Strict (HashMap)
 import qualified Data.HashMap.Strict as HashMap
 import Data.Set (Set)
@@ -16,32 +17,24 @@ import qualified Data.Set as Set
 
 type N = Int
 
-type Input = MapGrid Char
+type Input = UArrayGrid Char
 
 parseAll :: String -> Input
-parseAll = parseMapGrid id
+parseAll = Grid.parse id
 
 -- Note: flipped, because we have (0, 0) at the top left corner
 turnRight :: V2 N -> V2 N
 turnRight (V2 (x, y)) = v2 (-y, x)
 
--- TODO: Extract to AoC.Grid
-iray :: MapGrid Char -> V2 N -> (N, N) -> [((N, N), Char)]
-iray g d pos =
-  concatMap toList
-  . takeWhile isJust
-  . map (\(V2 p) -> (p,) <$> g HashMap.!? p)
-  $ map (\i -> fromInteger i * d + v2 pos) [0..]
-
-startPos :: MapGrid Char -> (N, N)
-startPos = fst . head . filter ((== '^') . snd) . HashMap.toList
+startPos :: UArrayGrid Char -> (N, N)
+startPos = fst . head . filter ((== '^') . snd) . A.assocs
 
 walk :: Monoid m => ([(N, N)] -> m) -> Input -> (m, Bool)
 walk f g = go (startPos g) startDir mempty Set.empty
   where go !p !d visited loop
          | (p, d) `Set.member` loop = (visited, True)
          | otherwise =
-           let r = iray g' d p
+           let r = Grid.iray g' d p
            in
              case break ((== '#') . snd) r of
                (v, [])    -> (visited <> f (map fst v), False)
@@ -50,7 +43,7 @@ walk f g = go (startPos g) startDir mempty Set.empty
                               d'   = turnRight d
                           in go p' d' (visited <> f poss) (Set.insert (p, d) loop)
         startDir = v2 (0, -1)
-        g' = HashMap.insert (startPos g) '.' g
+        g' = g A.// [(startPos g, '.')]
 
 part1 :: Input -> Int
 part1 = length . fst . walk Set.fromList
@@ -61,7 +54,7 @@ part2 g =
   in
     length
     . filter (snd . walk (const ()))
-    . map (\c -> HashMap.insert c '#' g)
+    . map (\c -> g A.// [(c, '#')])
     . filter (/= startPos g)
     $ Set.toList candidates
 

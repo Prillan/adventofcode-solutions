@@ -11,11 +11,13 @@ library
   exposed-modules:     AoC
                        AoC.Draw.Chars
                        AoC.Grid
+                       AoC.Grid.New
                        AoC.Parse
                        AoC.Search
   -- other-modules:
   -- other-extensions:
   build-depends:       base
+                     , array
                      , containers
                      , fingertree
                      , hashable

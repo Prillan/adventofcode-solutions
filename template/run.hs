@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeApplications #-}
 import AoC
-import AoC.Grid
+import AoC.Grid.New as Grid
 
 import Control.Monad (guard)
 import Data.Bifunctor
