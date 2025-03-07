@@ -10,6 +10,7 @@ solutions are noted below.
 | [Haskell](#haskell) | 24/25 | ✓ | ✓ | 11/25 | 9/25 | ✓ | ✓ | ✓ | 12/25 | 20/25 |
 | [Koka](#koka) |  |  |  |  |  |  | 3/25 |  |  |  |
 | [Nix](#nix) |  |  |  |  |  |  | 1/25 |  |  |  |
+| [ngn/k](#k) | 2/25 |  |  |  |  |  |  |  |  | 2/25 |
 
 ## Running the Code
 
@@ -71,6 +72,13 @@ Solved:
 | 23 | [✓](./2015/day23/run.hs) | [✓](./2016/day23/run.hs) | [✓](./2017/day23/run.hs) |  |  | [✓](./2020/day23/run.hs) | [✓](./2021/day23/run.hs) | [✓](./2022/day23/run.hs) |  |  |
 | 24 | [✓](./2015/day24/run.hs) | [✓](./2016/day24/run.hs) | [✓](./2017/day24/run.hs) |  |  | [✓](./2020/day24/run.hs) | [✓](./2021/day24/run.hs) | [✓](./2022/day24/run.hs) |  |  |
 | 25 | [✓](./2015/day25/run.hs) | [✓](./2016/day25/run.hs) | [✓](./2017/day25/run.hs) |  |  | [✓](./2020/day25/run.hs) | [✓](./2021/day25/run.hs) | [✓](./2022/day25/run.hs) |  |  |
+
+## ngn/k
+Solved:
+ - [2015, day 1](./2015/day1/run.k)
+ - [2015, day 2](./2015/day2/run.k)
+ - [2024, day 1](./2024/day1/run.k)
+ - [2024, day 2](./2024/day2/run.k)
 
 ## Koka
 Solved:

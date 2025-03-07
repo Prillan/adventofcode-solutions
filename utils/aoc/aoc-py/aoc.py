@@ -47,6 +47,8 @@ class Config:
 
     @property
     def token_age(self) -> timedelta:
+        if self.token_added_at is None:
+            return timedelta.max
         return datetime.now() - self.token_added_at
 
     def set(self, key, value):
@@ -124,7 +126,7 @@ def main():
         # TODO: Get choices from somewhere else.
         "--language",
         "-l",
-        choices=["hs", "asm", "koka", "nix"],
+        choices=["hs", "asm", "k", "koka", "nix"],
         default="hs",
     )
     shell_parser.add_argument("day", type=int)

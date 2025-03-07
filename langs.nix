@@ -60,6 +60,36 @@
     '';
     shellRunHelp = "koka -o run run.kk && time ./run";
   };
+  k =
+    let runner = pkgs.writeScriptBin "k-runner" ''
+      #!${pkgs.bash}/bin/bash
+      if [ -z "$TARGET" ]; then
+        TARGET="$1"
+        shift
+      fi
+      exec ${pkgs.ngn-k}/bin/k "$TARGET"
+      '';
+    in
+      {
+        name = "ngn/k";
+        slug = "k";
+        url = "https://xpqz.github.io/kbook/Introduction.html";
+        full = false;
+        extension = "k";
+        buildInputs = [ pkgs.makeWrapper pkgs.ngn-k pkgs.rlwrap runner ];
+        buildPhase = ''
+          mkdir -p $out/share/
+          cp $src/run.k $out/share/
+
+          makeWrapper ${runner}/bin/k-runner run \
+            --set TARGET $out/share/run.k
+        '';
+        shellRunHelp = ''
+          k-runner run.k
+          # Dev:
+          # rlwrap k-repl
+        '';
+      };
   nix =
     let runner = pkgs.callPackage ./lib/nix/pkg.nix { };
     in
