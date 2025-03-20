@@ -10,7 +10,7 @@ solutions are noted below.
 | [Haskell](#haskell) | 24/25 | ✓ | ✓ | 11/25 | 9/25 | ✓ | ✓ | ✓ | 12/25 | 20/25 |
 | [Koka](#koka) |  |  |  |  |  |  | 3/25 |  |  |  |
 | [Nix](#nix) |  |  |  |  |  |  | 1/25 |  |  |  |
-| [ngn/k](#k) | 2/25 |  |  |  |  |  |  |  |  | 2/25 |
+| [ngn/k](#k) | 3/25 |  |  |  |  |  |  |  |  | 2/25 |
 
 ## Running the Code
 
@@ -77,6 +77,7 @@ Solved:
 Solved:
  - [2015, day 1](./2015/day1/run.k)
  - [2015, day 2](./2015/day2/run.k)
+ - [2015, day 3](./2015/day3/run.k)
  - [2024, day 1](./2024/day1/run.k)
  - [2024, day 2](./2024/day2/run.k)
 
