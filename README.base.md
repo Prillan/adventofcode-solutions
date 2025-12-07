@@ -33,18 +33,3 @@ NASM version 2.14.02 compiled on Jan  1 1980
 ## Language Completion
 
 $$$LANGUAGE_COMPLETION$$$
-
-## Notes
-
-- For 2020's event I (finally) started adding a library for common
-  functions, it can be found [here](./adventofcode).
-- The correct version of GHC can be pulled in by simply running
-  `nix-shell`. Of course, that requires that you have
-  [Nix](https://nixos.org/) installed.
-- I'm not sure what version of GHC (+ libraries) I used for earlier
-  years. I'll try to clean that up.
-- This README is also a WIP...
-
-## TODO
-
-- Use a single cabal project?

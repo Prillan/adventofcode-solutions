@@ -9,7 +9,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         readme = import ./readme.nix { inherit pkgs; };
-        copyReadme = pkgs.writeScriptBin "copy-readme" ''
+        copyReadme = pkgs.writeShellScriptBin "copy-readme" ''
           cp ${readme}/README.md .
           chmod u+w README.md
         '';
